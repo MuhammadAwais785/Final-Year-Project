@@ -8,6 +8,6 @@ import App from '../App';
 
 test('renders correctly', async () => {
   await ReactTestRenderer.act(() => {
-    ReactTestRenderer.create(<App />);
+    ReactTestRenderer.create(React.createElement(App));
   });
 });
