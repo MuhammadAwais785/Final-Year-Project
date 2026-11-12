@@ -27,7 +27,7 @@ export const colors = {
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 36, screen: 20 };
 
-export const radius = { input: 16, card: 32, pill: 9999 };
+export const radius = { input: 16, bubble: 24, card: 32, pill: 9999 };
 
 // Minimum touch target heights in dp (UI-9). Form fields and chips use `field`.
 export const touch = { parent: 48, field: 56, child: 72, childMain: 88 };
