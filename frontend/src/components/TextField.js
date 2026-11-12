@@ -1,16 +1,31 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
+import { colors, radius, spacing, textStyle, touch } from '../theme';
+import { FieldError, FieldLabel } from './FieldText';
 
-export default function TextField({ label, error, style, ...inputProps }) {
+/** Labelled text input with an optional error message. */
+export default function TextField({ label, error, language = 'en', style, ...inputProps }) {
   return <View style={style}>
-    {label && <Text style={styles.label}>{label}</Text>}
-    <TextInput style={[styles.input, error && styles.inputError]} accessibilityLabel={label} {...inputProps} />
-    {error && <Text style={styles.error}>{error}</Text>}
+    {label && <FieldLabel language={language}>{label}</FieldLabel>}
+    <TextInput
+      accessibilityLabel={label}
+      placeholderTextColor={colors.textMuted}
+      style={[textStyle('body', language), styles.input, error && styles.inputError]}
+      {...inputProps}
+    />
+    <FieldError language={language}>{error}</FieldError>
   </View>;
 }
+
 const styles = StyleSheet.create({
-  label: { fontWeight: '700', color: '#172554', marginBottom: 6 },
-  input: { backgroundColor: '#fff', borderColor: '#cbd5e1', borderWidth: 1, borderRadius: 10, padding: 13 },
-  inputError: { borderColor: '#dc2626' },
-  error: { color: '#dc2626', marginTop: 4 }
+  input: {
+    minHeight: touch.parent,
+    paddingHorizontal: spacing.md,
+    color: colors.text,
+    backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1.5,
+    borderRadius: radius.input,
+  },
+  inputError: { borderColor: colors.error },
 });

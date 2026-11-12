@@ -12,7 +12,7 @@ const AGE_OPTIONS = Array.from({ length: CHILD_AGE.MAX - CHILD_AGE.MIN + 1 }, (_
 });
 const LANGUAGE_OPTIONS = [
   { label: 'English', value: LANGUAGES.ENGLISH },
-  { label: 'اردو', value: LANGUAGES.URDU },
+  { label: 'اردو', value: LANGUAGES.URDU, language: LANGUAGES.URDU },
 ];
 
 /** UI-02 / FR-1: child name, age (3–7) and one language. Calls onSubmit with the validated profile. */
