@@ -29,9 +29,20 @@ export const radius = { input: 16, card: 24, pill: 9999 };
 // Minimum touch target heights in dp (UI-9).
 export const touch = { parent: 48, child: 72, childMain: 88 };
 
+// One font file per weight (src/assets/fonts). Android and iOS both load them by these names.
 export const fonts = {
-  en: 'PlusJakartaSans',
-  ur: 'NotoNastaliqUrdu',
+  en: {
+    400: 'PlusJakartaSans-Regular',
+    500: 'PlusJakartaSans-Medium',
+    600: 'PlusJakartaSans-SemiBold',
+    700: 'PlusJakartaSans-Bold',
+    800: 'PlusJakartaSans-ExtraBold',
+  },
+  ur: {
+    400: 'NotoNastaliqUrdu-Regular',
+    500: 'NotoNastaliqUrdu-Medium',
+    700: 'NotoNastaliqUrdu-Bold',
+  },
 };
 
 // Urdu Nastaliq needs about twice the line height of English or letters get clipped.
@@ -55,17 +66,18 @@ export const typography = {
 };
 
 /**
- * Text style for a language: font, size and direction.
+ * Text style for a language: font file, size and direction.
+ * The weight is carried by the font file, so fontWeight is not set (Android would fake it).
  * Urdu has no display/label sizes, so those fall back to the closest Urdu style.
  */
 const URDU_FALLBACK = { display: 'headlineLg', headlineSm: 'headlineMd', label: 'body', labelSm: 'body' };
 
 export function textStyle(variant, language = 'en') {
-  if (language === 'ur') {
-    const style = typography.ur[variant] || typography.ur[URDU_FALLBACK[variant]] || typography.ur.body;
-    return { ...style, fontFamily: fonts.ur, writingDirection: 'rtl', textAlign: 'right' };
-  }
-  return { ...(typography.en[variant] || typography.en.body), fontFamily: fonts.en };
+  const urdu = language === 'ur';
+  const table = urdu ? typography.ur : typography.en;
+  const { fontWeight, ...style } = table[variant] || (urdu && table[URDU_FALLBACK[variant]]) || table.body;
+  const fontFamily = fonts[urdu ? 'ur' : 'en'][fontWeight];
+  return urdu ? { ...style, fontFamily, writingDirection: 'rtl', textAlign: 'right' } : { ...style, fontFamily };
 }
 
 // Soft shadows tinted with the text colour (elevation for Android, shadow* for iOS).
