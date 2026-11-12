@@ -8,6 +8,17 @@ export const colors = {
   mint: '#B9E4C9',
   lavender: '#CDB4DB',
   clay: '#D97736',
+  childText: '#2D3748',
+  onSky: '#1D4E68', // text and icons on sky / peach / mint tiles
+  onPeach: '#7B3F00',
+  onMint: '#155E3D',
+  starBackground: '#FFECC7',
+  starBorder: '#FFDC99',
+  star: '#E68A00',
+  onStar: '#754400',
+  childChipBorder: '#FFE7D1',
+  exitBackground: '#EFE7DE',
+  exitBorder: '#DFCFC2',
   // Parent Portal, Home and PIN (values from docs/design/html)
   parentBackground: '#FAF8FF',
   card: '#FFFFFF',
@@ -55,6 +66,7 @@ export const typography = {
     headlineLg: { fontSize: 28, fontWeight: '700', lineHeight: 36 },
     headlineMd: { fontSize: 24, fontWeight: '700', lineHeight: 32 },
     headlineSm: { fontSize: 20, fontWeight: '600', lineHeight: 28 },
+    childTitle: { fontSize: 20, fontWeight: '800', lineHeight: 28 }, // child tiles and the Doctor's bubble
     bodyLg: { fontSize: 18, fontWeight: '500', lineHeight: 28 },
     body: { fontSize: 16, fontWeight: '400', lineHeight: 24 },
     labelLg: { fontSize: 18, fontWeight: '700', lineHeight: 24 },
@@ -74,7 +86,9 @@ export const typography = {
  * The weight is carried by the font file, so fontWeight is not set (Android would fake it).
  * Urdu has no display/label sizes, so those fall back to the closest Urdu style.
  */
-const URDU_FALLBACK = { display: 'headlineLg', headlineSm: 'headlineMd', labelLg: 'bodyLg', label: 'body', labelSm: 'body' };
+const URDU_FALLBACK = {
+  display: 'headlineLg', headlineSm: 'headlineMd', childTitle: 'headlineMd', labelLg: 'bodyLg', label: 'body', labelSm: 'body',
+};
 
 export function textStyle(variant, language = 'en') {
   const urdu = language === 'ur';
