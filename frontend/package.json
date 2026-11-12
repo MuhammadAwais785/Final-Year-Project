@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@noble/hashes": "1.8.0",
     "@react-native-async-storage/async-storage": "^3.1.1",
     "@react-native/new-app-screen": "0.88.1",
     "axios": "^1.21.1",

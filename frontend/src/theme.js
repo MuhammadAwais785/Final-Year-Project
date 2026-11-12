@@ -19,6 +19,14 @@ export const colors = {
   childChipBorder: '#FFE7D1',
   exitBackground: '#EFE7DE',
   exitBorder: '#DFCFC2',
+  // Home screen mode cards (design: app_home_mode_selection)
+  childCard: '#FFDBCA',
+  onChildCard: '#331200',
+  clayDark: '#944A1A', // Child Mode button and Urdu title
+  clayLight: '#FE9E67',
+  parentCard: '#E4E7FE',
+  primarySoft: '#C8E6FF',
+  toggle: '#DEE1F8',
   // Parent Portal, Home and PIN (values from docs/design/html)
   parentBackground: '#FAF8FF',
   card: '#FFFFFF',
