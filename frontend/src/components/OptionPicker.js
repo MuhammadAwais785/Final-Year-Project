@@ -1,10 +1,10 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, textStyle, touch } from '../theme';
+import { colors, radius, shadows, spacing, textStyle, touch } from '../theme';
 import { FieldError, FieldLabel } from './FieldText';
 
 /**
- * Single choice from a few options, shown as tappable chips.
+ * Single choice from a few options, shown as equal-width chips in one row (design: add_a_child).
  * options: [{ label, value, language? }]; an option's own language sets its font (e.g. "اردو").
  * In Urdu the chips run right to left.
  */
@@ -22,7 +22,7 @@ export default function OptionPicker({ label, options, value, onChange, error, l
           accessibilityState={{ selected }}
           onPress={() => onChange(option.value)}
           style={[styles.chip, selected && styles.chipSelected]}>
-          <Text style={[textStyle('body', option.language || language), styles.chipText, selected && styles.chipTextSelected]}>
+          <Text style={[textStyle('labelLg', option.language || language), styles.chipText, selected && styles.chipTextSelected]}>
             {option.label}
           </Text>
         </Pressable>;
@@ -33,20 +33,18 @@ export default function OptionPicker({ label, options, value, onChange, error, l
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  row: { flexDirection: 'row', gap: spacing.sm },
   rowRtl: { flexDirection: 'row-reverse' },
   chip: {
-    minWidth: touch.parent,
-    minHeight: touch.parent,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
+    flex: 1,
+    minHeight: touch.field,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.input,
+    backgroundColor: colors.field,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipSelected: { backgroundColor: colors.primary, ...shadows.raised },
   chipText: { color: colors.text, textAlign: 'center' },
   chipTextSelected: { color: colors.onPrimary },
 });

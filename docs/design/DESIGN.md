@@ -8,7 +8,7 @@ Screens are in [screens/](screens/); see [README.md](README.md) for the screen l
 | | Child Mode | Parent Portal (also Home and PIN) |
 |---|---|---|
 | Feel | Warm, calm, playful | Clean, neutral, easy to scan |
-| Background | Cream `#FFF8F0` | Light grey `#F5F7FA`, white cards |
+| Background | Cream `#FFF8F0` | Light lavender-white `#FAF8FF`, white cards |
 | Text | Large, minimal, one language | Standard, one language (EN/اردو toggle) |
 | Touch targets | At least 72dp (80dp for main actions) | At least 48dp |
 
@@ -24,15 +24,18 @@ The colour difference tells the child and the parent which area they are in.
 | `mint` | `#B9E4C9` | Child tile 3, success, Play again |
 | `lavender` | `#CDB4DB` | Calming break accents only |
 | `clay` | `#D97736` | Star icon, warm highlights |
-| `parentBackground` | `#F5F7FA` | Parent, Home and PIN screens |
+| `parentBackground` | `#FAF8FF` | Parent, Home and PIN screens |
 | `card` | `#FFFFFF` | Cards on any background |
-| `primary` | `#3D7EA6` | Parent buttons, links, progress dots |
-| `primaryDark` | `#186288` | Pressed state, chart line |
-| `text` | `#2D3142` | Main text (never pure black) |
-| `textMuted` | `#64748B` | Secondary text, metadata |
-| `border` | `#E2E8F0` | Card and input borders |
-| `success` | `#58B399` | Positive progress, "Synced" |
-| `error` | `#C25450` | Form errors (soft red, not alarming) |
+| `field` | `#F3F2FF` | Text inputs and unselected chips |
+| `surface` | `#EBEDFF` | Icon circles, language toggle |
+| `primary` | `#186288` | Buttons, selected chips, links, progress dots |
+| `primaryLight` | `#397BA3` | Secondary highlights |
+| `text` | `#171B2B` | Main text (never pure black) |
+| `textMuted` | `#40484E` | Secondary text, metadata |
+| `border` | `#C0C7CF` | Dividers |
+| `success` | `#006954` | Positive progress, "Synced" |
+| `error` | `#BA1A1A` | Form errors |
+| `errorLight` | `#FFDAD6` | Error banners (e.g. wrong PIN) |
 
 ## Typography
 
@@ -44,6 +47,7 @@ The colour difference tells the child and the parent which area they are in.
 | Headline small | 20px / 600, line 28 | n/a |
 | Body large | 18px / 500, line 28 | 18px / 500, line 40 |
 | Body | 16px / 400, line 24 | 15px / 400, line 34 |
+| Label large (chips, buttons) | 18px / 700, line 24 | n/a |
 | Label | 14px / 600, line 20 | n/a |
 | Small label | 12px / 600, line 16 | n/a |
 
@@ -55,7 +59,7 @@ Urdu rules:
 
 ## Shape, spacing, depth
 
-- Radius: cards 24px, inputs 16px, buttons and chips fully rounded (pill).
+- Radius: cards 32px, inputs and chips 16px, main buttons fully rounded (pill).
 - Spacing scale: 4, 8, 16, 24, 36px. Screen margin 20px, gutter 16px.
 - Shadows are soft and tinted `#2D3142`:
   - Card: `0 4px 16px` at 5%
@@ -74,8 +78,9 @@ Urdu rules:
 | Listening indicator | Mic + waveform + "Listening…" only while the app is listening (UI-3) |
 | Exit control | Only "Grown-ups: hold to exit" on child screens; no bottom navigation |
 | PIN keypad | 4-digit PIN, 72dp round keys, numbers only (UC-23, BR-34) |
-| Input field | White, 16px radius, 1.5px `border`; focus = `primary` border |
-| Parent card | White, 24px radius, card shadow |
+| Input field | `field` background, no border, 16px radius, 56dp tall; error = red "!" marker in the field and beside the message |
+| Option chips | Equal width in one row, 56dp tall, 16px radius, `field` background; selected = `primary` with white text |
+| Parent card | White, 32px radius, card shadow |
 
 ## Content rules (from the SRS)
 

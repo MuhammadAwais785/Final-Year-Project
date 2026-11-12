@@ -8,26 +8,29 @@ export const colors = {
   mint: '#B9E4C9',
   lavender: '#CDB4DB',
   clay: '#D97736',
-  // Parent Portal, Home and PIN
-  parentBackground: '#F5F7FA',
+  // Parent Portal, Home and PIN (values from docs/design/html)
+  parentBackground: '#FAF8FF',
   card: '#FFFFFF',
-  primary: '#3D7EA6',
-  primaryDark: '#186288',
+  field: '#F3F2FF', // inputs and unselected chips
+  surface: '#EBEDFF', // icon circles, toggles
+  primary: '#186288',
+  primaryLight: '#397BA3',
   onPrimary: '#FFFFFF',
   // Shared
-  text: '#2D3142',
-  textMuted: '#64748B',
-  border: '#E2E8F0',
-  success: '#58B399',
-  error: '#C25450',
+  text: '#171B2B',
+  textMuted: '#40484E',
+  border: '#C0C7CF',
+  success: '#006954',
+  error: '#BA1A1A',
+  errorLight: '#FFDAD6',
 };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 36, screen: 20 };
 
-export const radius = { input: 16, card: 24, pill: 9999 };
+export const radius = { input: 16, card: 32, pill: 9999 };
 
-// Minimum touch target heights in dp (UI-9).
-export const touch = { parent: 48, child: 72, childMain: 88 };
+// Minimum touch target heights in dp (UI-9). Form fields and chips use `field`.
+export const touch = { parent: 48, field: 56, child: 72, childMain: 88 };
 
 // One font file per weight (src/assets/fonts). Android and iOS both load them by these names.
 export const fonts = {
@@ -54,6 +57,7 @@ export const typography = {
     headlineSm: { fontSize: 20, fontWeight: '600', lineHeight: 28 },
     bodyLg: { fontSize: 18, fontWeight: '500', lineHeight: 28 },
     body: { fontSize: 16, fontWeight: '400', lineHeight: 24 },
+    labelLg: { fontSize: 18, fontWeight: '700', lineHeight: 24 },
     label: { fontSize: 14, fontWeight: '600', lineHeight: 20 },
     labelSm: { fontSize: 12, fontWeight: '600', lineHeight: 16 },
   },
@@ -70,7 +74,7 @@ export const typography = {
  * The weight is carried by the font file, so fontWeight is not set (Android would fake it).
  * Urdu has no display/label sizes, so those fall back to the closest Urdu style.
  */
-const URDU_FALLBACK = { display: 'headlineLg', headlineSm: 'headlineMd', label: 'body', labelSm: 'body' };
+const URDU_FALLBACK = { display: 'headlineLg', headlineSm: 'headlineMd', labelLg: 'bodyLg', label: 'body', labelSm: 'body' };
 
 export function textStyle(variant, language = 'en') {
   const urdu = language === 'ur';

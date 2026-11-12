@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput } from 'react-native';
 import ReactTestRenderer from 'react-test-renderer';
+import { ErrorDot } from '../src/components/FieldText';
 import OptionPicker from '../src/components/OptionPicker';
 import TextField from '../src/components/TextField';
 import { colors } from '../src/theme';
@@ -22,13 +23,13 @@ describe('TextField', () => {
     const root = render(<TextField label="Child's name" value="" onChangeText={() => {}} />);
     expect(findText(root, "Child's name")).toBeDefined();
     expect(textNodes(root)).toHaveLength(1);
-    expect(flat(root.findByType(TextInput)).borderColor).toBe(colors.border);
+    expect(root.findAllByType(ErrorDot)).toHaveLength(0);
   });
 
-  test('shows the error in the error colour and colours the border', () => {
+  test('shows the error in the error colour with a marker in the field and beside the message', () => {
     const root = render(<TextField label="Name" error="Please enter the name." />);
     expect(flat(findText(root, 'Please enter the name.')).color).toBe(colors.error);
-    expect(flat(root.findByType(TextInput)).borderColor).toBe(colors.error);
+    expect(root.findAllByType(ErrorDot)).toHaveLength(2);
   });
 
   test('uses the Urdu font and right-to-left text in Urdu', () => {
@@ -70,14 +71,14 @@ describe('OptionPicker', () => {
 
   test('renders an option in its own language font', () => {
     const root = render(<OptionPicker options={options} value={null} onChange={() => {}} />);
-    expect(flat(findText(root, 'اردو')).fontFamily).toBe('NotoNastaliqUrdu-Regular');
-    expect(flat(findText(root, 'English')).fontFamily).toBe('PlusJakartaSans-Regular');
+    expect(flat(findText(root, 'اردو')).fontFamily).toBe('NotoNastaliqUrdu-Medium');
+    expect(flat(findText(root, 'English')).fontFamily).toBe('PlusJakartaSans-Bold');
   });
 
   test('runs chips right to left in Urdu', () => {
     const root = render(<OptionPicker options={options} value={null} onChange={() => {}} language="ur" />);
-    const row = root.findAllByType(View).find((v) => flat(v)?.flexWrap === 'wrap');
-    expect(flat(row).flexDirection).toBe('row-reverse');
+    const chipRow = root.findByProps({ testID: 'option-en' }).parent;
+    expect(flat(chipRow).flexDirection).toBe('row-reverse');
   });
 
   test('shows an error message when given', () => {

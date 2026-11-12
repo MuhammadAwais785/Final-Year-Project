@@ -7,7 +7,8 @@ const FONT_DIR = path.join(__dirname, '../src/assets/fonts');
 describe('theme', () => {
   test('uses the design system background colours', () => {
     expect(colors.childBackground).toBe('#FFF8F0');
-    expect(colors.parentBackground).toBe('#F5F7FA');
+    expect(colors.parentBackground).toBe('#FAF8FF');
+    expect(colors.primary).toBe('#186288');
   });
 
   test('touch targets meet UI-9 (at least 48dp, 72dp for children)', () => {
