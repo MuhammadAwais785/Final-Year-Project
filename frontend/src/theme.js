@@ -26,7 +26,11 @@ export const colors = {
   clayLight: '#FE9E67',
   parentCard: '#E4E7FE',
   primarySoft: '#C8E6FF',
+  onPrimarySoft: '#004C6D',
   toggle: '#DEE1F8',
+  // Privacy notice (design: consent_and_permissions)
+  privacyBackground: '#DDF7F3',
+  privacyIcon: '#1F836B',
   // Parent Portal, Home and PIN (values from docs/design/html)
   parentBackground: '#FAF8FF',
   card: '#FFFFFF',

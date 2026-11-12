@@ -35,6 +35,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The speech games listen to your child's words. Voice is processed only on this phone and never uploaded.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Optional mood monitoring uses the front camera to adjust the pace. Images are processed only on this phone and never saved or uploaded.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
