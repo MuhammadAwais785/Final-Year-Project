@@ -12,6 +12,7 @@
   "dependencies": {
     "@noble/hashes": "1.8.0",
     "@react-native-async-storage/async-storage": "^3.1.1",
+    "@react-native-voice/voice": "^3.2.4",
     "@react-native/new-app-screen": "0.88.1",
     "axios": "^1.21.1",
     "react": "19.3.0",
