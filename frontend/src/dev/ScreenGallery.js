@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChildProfileProvider, useChildProfile } from '../context/ChildProfileContext';
+import BaselineScreen from '../modules/m01_onboarding/BaselineScreen';
 import ChildProfileScreen from '../modules/m01_onboarding/ChildProfileScreen';
 import ConsentScreen from '../modules/m01_onboarding/ConsentScreen';
 import HomeScreen from '../modules/m01_onboarding/HomeScreen';
@@ -23,6 +24,7 @@ export const SCREENS = [
   { id: 'pin', title: 'Parent PIN', render: (back) => <PinScreen store={pinStore} onUnlocked={back} onBack={back} onForgotPin={back} /> },
   { id: 'add-child', title: 'Add a child', render: (back) => <ChildProfileScreen onBack={back} onSaved={back} /> },
   { id: 'consent', title: 'Consent and permissions', child: ALI, render: (back) => <ConsentScreen onBack={back} onSaved={back} /> },
+  { id: 'baseline', title: 'Baseline check', child: ALI, render: (back) => <BaselineScreen onBack={back} onExit={back} onComplete={back} /> },
   { id: 'child-home-en', title: 'Child Mode home (English)', child: ALI, render: (back) => <ChildHomeScreen stars={12} onSelectGame={back} onExit={back} /> },
   { id: 'child-home-ur', title: 'Child Mode home (Urdu)', child: ALI_UR, render: (back) => <ChildHomeScreen stars={12} onSelectGame={back} onExit={back} /> },
 ];
