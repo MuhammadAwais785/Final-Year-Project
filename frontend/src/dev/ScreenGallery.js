@@ -11,6 +11,7 @@ import * as pinStore from '../modules/m01_onboarding/pinStore';
 import ChildHomeScreen from '../modules/m03_games/ChildHomeScreen';
 import ObjectNamingScreen from '../modules/m03_games/ObjectNamingScreen';
 import RoundSummary from '../modules/m03_games/RoundSummary';
+import CalmingBreakScreen from '../modules/m07_intervention/CalmingBreakScreen';
 import { colors, radius, spacing, textStyle } from '../theme';
 
 /**
@@ -32,6 +33,11 @@ export const SCREENS = [
   { id: 'naming-en', title: 'Object naming game (English)', child: ALI, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
   { id: 'naming-ur', title: 'Object naming game (Urdu)', child: ALI_UR, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
   { id: 'naming-summary', title: 'Object naming summary', child: ALI, render: (back) => <SummarySample language="en" back={back} /> },
+  { id: 'calm-start-en', title: 'Calming break: start (English)', child: ALI, render: (back) => <CalmingBreakScreen onDone={back} onExit={back} /> },
+  { id: 'calm-start-ur', title: 'Calming break: start (Urdu)', child: ALI_UR, render: (back) => <CalmingBreakScreen onDone={back} onExit={back} /> },
+  { id: 'calm-breathing', title: 'Calming break: breathing', child: ALI, render: (back) => <CalmingBreakScreen initialStep="breathing" onDone={back} onExit={back} /> },
+  { id: 'calm-sounds', title: 'Calming break: soothing sounds', child: ALI, render: (back) => <CalmingBreakScreen initialStep="sounds" onDone={back} onExit={back} /> },
+  { id: 'calm-ready', title: 'Calming break: ready to play', child: ALI, render: (back) => <CalmingBreakScreen initialStep="ready" onDone={back} onExit={back} /> },
 ];
 
 function SummarySample({ language, back }) {
