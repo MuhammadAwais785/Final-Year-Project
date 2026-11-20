@@ -1,0 +1,38 @@
+// Child-facing messages for the object naming game, one set per language (BR-3).
+// Positive wording only: no "wrong", no medical terms (UI-7, BR-22).
+export const NAMING_TEXT = {
+  en: {
+    ask: 'What is this?',
+    listening: 'Listening…',
+    speak: 'Tap and say it',
+    tryAgain: "Nice try! Let's try again.",
+    unclear: "I couldn't hear that well. Let's try once more!",
+    correct: 'Great job!',
+    movingOn: "That's okay! Let's try another one.",
+    next: 'Next word',
+    earned: (n) => `+${n} ${n === 1 ? 'Star' : 'Stars'}!`,
+    praise: 'Super job!',
+    summary: (c, n) => `You named ${c} of ${n} things!`,
+    tried: (n) => `You tried ${n} things!`,
+    playAgain: 'Play again',
+    done: 'Done',
+    exit: 'Grown-ups: hold to exit',
+  },
+  ur: {
+    ask: 'یہ کیا ہے؟',
+    listening: 'سن رہے ہیں…',
+    speak: 'دبائیں اور بولیں',
+    tryAgain: 'اچھی کوشش! پھر سے بولیں۔',
+    unclear: 'آواز صاف نہیں آئی۔ ایک بار اور بولیں!',
+    correct: 'شاباش!',
+    movingOn: 'کوئی بات نہیں! آئیں اگلی چیز دیکھیں۔',
+    next: 'اگلا لفظ',
+    earned: (n) => `+${n} ${n === 1 ? 'ستارہ' : 'ستارے'}!`,
+    praise: 'بہت خوب!',
+    summary: (c, n) => `آپ نے ${n} میں سے ${c} چیزوں کے نام بتائے!`,
+    tried: (n) => `آپ نے ${n} چیزیں بولنے کی کوشش کی!`,
+    playAgain: 'دوبارہ کھیلیں',
+    done: 'ختم',
+    exit: 'والدین: باہر نکلنے کے لیے دبا کر رکھیں',
+  },
+};

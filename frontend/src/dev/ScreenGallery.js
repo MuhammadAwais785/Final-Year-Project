@@ -9,6 +9,8 @@ import HomeScreen from '../modules/m01_onboarding/HomeScreen';
 import PinScreen from '../modules/m01_onboarding/PinScreen';
 import * as pinStore from '../modules/m01_onboarding/pinStore';
 import ChildHomeScreen from '../modules/m03_games/ChildHomeScreen';
+import ObjectNamingScreen from '../modules/m03_games/ObjectNamingScreen';
+import RoundSummary from '../modules/m03_games/RoundSummary';
 import { colors, radius, spacing, textStyle } from '../theme';
 
 /**
@@ -27,7 +29,16 @@ export const SCREENS = [
   { id: 'baseline', title: 'Baseline check', child: ALI, render: (back) => <BaselineScreen onBack={back} onExit={back} onComplete={back} /> },
   { id: 'child-home-en', title: 'Child Mode home (English)', child: ALI, render: (back) => <ChildHomeScreen stars={12} onSelectGame={back} onExit={back} /> },
   { id: 'child-home-ur', title: 'Child Mode home (Urdu)', child: ALI_UR, render: (back) => <ChildHomeScreen stars={12} onSelectGame={back} onExit={back} /> },
+  { id: 'naming-en', title: 'Object naming game (English)', child: ALI, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
+  { id: 'naming-ur', title: 'Object naming game (Urdu)', child: ALI_UR, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
+  { id: 'naming-summary', title: 'Object naming summary', child: ALI, render: (back) => <SummarySample language="en" back={back} /> },
 ];
+
+function SummarySample({ language, back }) {
+  return <SafeAreaView style={styles.summary}>
+    <RoundSummary summary={{ stars: 10, correct: 5, practiced: 6, inconclusive: 1 }} language={language} onPlayAgain={back} onDone={back} />
+  </SafeAreaView>;
+}
 
 function SampleChild({ child }) {
   const { setChild } = useChildProfile();
@@ -57,6 +68,7 @@ export default function ScreenGallery() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.parentBackground },
   content: { padding: spacing.screen, gap: spacing.sm },
+  summary: { flex: 1, justifyContent: 'center', padding: spacing.screen, backgroundColor: colors.childBackground },
   title: { color: colors.text },
   item: { padding: spacing.md, borderRadius: radius.input, backgroundColor: colors.card },
 });
