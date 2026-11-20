@@ -5,6 +5,7 @@ import { ChildProfileProvider, useChildProfile } from '../context/ChildProfileCo
 import BaselineScreen from '../modules/m01_onboarding/BaselineScreen';
 import ChildProfileScreen from '../modules/m01_onboarding/ChildProfileScreen';
 import ConsentScreen from '../modules/m01_onboarding/ConsentScreen';
+import GoalsScreen from '../modules/m01_onboarding/GoalsScreen';
 import HomeScreen from '../modules/m01_onboarding/HomeScreen';
 import PinScreen from '../modules/m01_onboarding/PinScreen';
 import * as pinStore from '../modules/m01_onboarding/pinStore';
@@ -29,6 +30,8 @@ export const SCREENS = [
   { id: 'add-child', title: 'Add a child', render: (back) => <ChildProfileScreen onBack={back} onSaved={back} /> },
   { id: 'consent', title: 'Consent and permissions', child: ALI, render: (back) => <ConsentScreen onBack={back} onSaved={back} /> },
   { id: 'baseline', title: 'Baseline check', child: ALI, render: (back) => <BaselineScreen onBack={back} onExit={back} onComplete={back} /> },
+  { id: 'goals-en', title: 'Goals (English)', child: ALI, render: (back) => <GoalsScreen onBack={back} onSaved={back} /> },
+  { id: 'goals-ur', title: 'Goals (Urdu)', child: ALI_UR, render: (back) => <GoalsScreen language="ur" onBack={back} onSaved={back} /> },
   { id: 'child-home-en', title: 'Child Mode home (English)', child: ALI, render: (back) => <ChildHomeScreen stars={12} onSelectGame={back} onExit={back} /> },
   { id: 'child-home-ur', title: 'Child Mode home (Urdu)', child: ALI_UR, render: (back) => <ChildHomeScreen stars={12} onSelectGame={back} onExit={back} /> },
   { id: 'naming-en', title: 'Object naming game (English)', child: ALI, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
