@@ -8,7 +8,14 @@ import Waveform from '../src/components/Waveform';
 import { ChildProfileProvider, useChildProfile } from '../src/context/ChildProfileContext';
 import { createMockRecognizer } from '../src/modules/m03_games/mockRecognizer';
 import ObjectNamingScreen from '../src/modules/m03_games/ObjectNamingScreen';
+import MilestoneBadge from '../src/modules/m03_games/MilestoneBadge';
 import { objectItem } from '../src/modules/m03_games/objectNamingContent';
+
+// The screen imports the real reward store; the tests pass a fake one, so storage is only stubbed.
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn(async () => null),
+  setItem: jest.fn(async () => {}),
+}));
 
 const IDS = ['apple', 'ball']; // 2 words per round keeps the tests short
 const { act } = ReactTestRenderer;
@@ -21,12 +28,12 @@ function WithChild({ child, children }) {
 }
 
 let tree;
-async function render(script, { language = 'en', recognizer, ...props } = {}) {
+async function render(script, { language = 'en', childId, recognizer, ...props } = {}) {
   const rec = recognizer ?? createMockRecognizer({ script });
   await act(async () => {
     tree = ReactTestRenderer.create(
       <ChildProfileProvider>
-        <WithChild child={{ name: 'Ali', language }}>
+        <WithChild child={{ _id: childId, name: 'Ali', language }}>
           <ObjectNamingScreen recognizer={rec} itemIds={IDS} roundSize={2} {...props} />
         </WithChild>
       </ChildProfileProvider>,
@@ -324,5 +331,113 @@ describe('Urdu (BR-3)', () => {
     expect([].concat(urdu.props.style).flat().some((s) => s && s.writingDirection === 'rtl')).toBe(true);
     await wait();
     expect(bubble()).toBe('اچھی کوشش! پھر سے بولیں۔');
+  });
+});
+
+describe('rewards (FR-6, FR-8, BR-19)', () => {
+  const fakeRewards = (result = { totalStars: 4, todayStars: 4, milestoneReachedToday: false, milestoneJustReached: false }) =>
+    ({ addStars: jest.fn(async () => result) });
+  const finish = async (script, props) => {
+    await render(script, props);
+    for (let i = 0; i < 2; i++) {
+      await wait();
+      await press('next');
+    }
+  };
+
+  test('saves the round stars once for this child when the round ends', async () => {
+    const rewards = fakeRewards();
+    await finish(['recognized', 'recognized'], { childId: 'kid-1', rewards, now: () => 123 });
+    expect(rewards.addStars).toHaveBeenCalledTimes(1);
+    expect(rewards.addStars).toHaveBeenCalledWith('kid-1', 4, 123);
+    expect(has('milestone-badge')).toBe(false);
+    await wait(5000);
+    expect(rewards.addStars).toHaveBeenCalledTimes(1);
+  });
+
+  test('shows the daily badge when the milestone is just reached, and hides it on Play again', async () => {
+    const rewards = fakeRewards({ totalStars: 10, todayStars: 10, milestoneReachedToday: true, milestoneJustReached: true });
+    await finish(['recognized', 'recognized'], { childId: 'kid-1', rewards });
+    expect(root().findAllByType(MilestoneBadge)).toHaveLength(1);
+    await press('play-again');
+    expect(root().findAllByType(MilestoneBadge)).toHaveLength(0);
+  });
+
+  test('a double tap on Done does not add stars again', async () => {
+    const rewards = fakeRewards();
+    const onDone = jest.fn();
+    await finish(['recognized', 'recognized'], { childId: 'kid-1', rewards, onDone });
+    await act(async () => {
+      const done = root().findByProps({ testID: 'done' });
+      done.props.onPress();
+      done.props.onPress();
+    });
+    expect(rewards.addStars).toHaveBeenCalledTimes(1);
+  });
+
+  test('nothing is saved without a child id', async () => {
+    const rewards = fakeRewards();
+    await finish(['recognized', 'recognized'], { rewards });
+    expect(rewards.addStars).not.toHaveBeenCalled();
+  });
+
+  test('a round with no stars saves nothing', async () => {
+    const rewards = fakeRewards();
+    await render(Array(10).fill('incorrect'), { childId: 'kid-1', rewards });
+    for (let word = 0; word < 2; word++) {
+      for (let attempt = 0; attempt < 4; attempt++) {
+        await wait();
+        await press('listen-button');
+      }
+      await wait();
+      await press('next');
+    }
+    expect(has('done')).toBe(true);
+    expect(rewards.addStars).not.toHaveBeenCalled();
+  });
+
+  test('Play again saves the next round too', async () => {
+    const rewards = fakeRewards();
+    await finish(['recognized', 'recognized', 'recognized', 'recognized'], { childId: 'kid-1', rewards });
+    await press('play-again');
+    for (let i = 0; i < 2; i++) {
+      await wait();
+      await press('next');
+    }
+    expect(rewards.addStars).toHaveBeenCalledTimes(2);
+  });
+
+  test('a late milestone from the last round does not show on the next round', async () => {
+    let release;
+    const addStars = jest.fn()
+      .mockImplementationOnce(() => new Promise((resolve) => { release = resolve; }))
+      .mockResolvedValue({ milestoneJustReached: false });
+    const script = ['recognized', 'recognized', 'recognized', 'recognized'];
+    await finish(script, { childId: 'kid-1', rewards: { addStars } });
+    await press('play-again');
+    await act(async () => release({ milestoneJustReached: true }));
+    for (let i = 0; i < 2; i++) {
+      await wait();
+      await press('next');
+    }
+    expect(addStars).toHaveBeenCalledTimes(2);
+    expect(root().findAllByType(MilestoneBadge)).toHaveLength(0);
+  });
+
+  test('a slow save finishing after unmount sets no state', async () => {
+    let release;
+    const rewards = { addStars: jest.fn(() => new Promise((resolve) => { release = resolve; })) };
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    await finish(['recognized', 'recognized'], { childId: 'kid-1', rewards });
+    await act(async () => tree.unmount());
+    tree = null;
+    await act(async () => release({ milestoneJustReached: true }));
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  test('a failing save does not break the summary', async () => {
+    const rewards = { addStars: jest.fn(async () => { throw new Error('disk'); }) };
+    await finish(['recognized', 'recognized'], { childId: 'kid-1', rewards });
+    expect(has('done')).toBe(true);
   });
 });

@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import ActionButton from '../../components/ActionButton';
 import { colors, radius, spacing, textStyle } from '../../theme';
 import DoctorAvatar from '../m02_avatar/DoctorAvatar';
+import MilestoneBadge from './MilestoneBadge';
 import { NAMING_TEXT } from './objectNamingText';
+import { pickPraise } from './rewardText';
 
 /** End of a round (UI-4): praise, how many were named, stars earned, Play again / Done. */
-export default function RoundSummary({ summary, language, onPlayAgain, onDone }) {
+export default function RoundSummary({ summary, language, milestone = false, onPlayAgain, onDone }) {
   const text = NAMING_TEXT[language];
+  const [praise] = useState(() => pickPraise(language)); // picked once so it does not change on re-render
   return <View style={styles.wrap}>
     <DoctorAvatar size={170} language={language} />
     <Text
       accessibilityLabel={language === 'ur' ? `${summary.stars} ${summary.stars === 1 ? 'ستارہ' : 'ستارے'}` : `${summary.stars} stars`}
       style={styles.stars}>{'★'.repeat(Math.min(summary.stars, 12))}</Text>
-    <View style={styles.chip}><Text style={[textStyle('label', language), styles.chipText]}>{text.praise}</Text></View>
+    <View style={styles.chip}><Text style={[textStyle('label', language), styles.chipText]}>{praise}</Text></View>
+    {milestone && <MilestoneBadge language={language} />}
     <Text style={[textStyle('headlineMd', language), styles.title]}>{summary.correct === 0 ? text.tried(summary.practiced) : text.summary(summary.correct, summary.practiced)}</Text>
     <View style={styles.actions}>
       <ActionButton testID="play-again" title={text.playAgain} icon="↻" onPress={onPlayAgain} />

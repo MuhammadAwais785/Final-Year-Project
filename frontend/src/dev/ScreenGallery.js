@@ -33,6 +33,7 @@ export const SCREENS = [
   { id: 'naming-en', title: 'Object naming game (English)', child: ALI, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
   { id: 'naming-ur', title: 'Object naming game (Urdu)', child: ALI_UR, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
   { id: 'naming-summary', title: 'Object naming summary', child: ALI, render: (back) => <SummarySample language="en" back={back} /> },
+  { id: 'naming-milestone', title: 'Object naming summary with daily badge', child: ALI, render: (back) => <SummarySample language="en" milestone back={back} /> },
   { id: 'calm-start-en', title: 'Calming break: start (English)', child: ALI, render: (back) => <CalmingBreakScreen onDone={back} onExit={back} /> },
   { id: 'calm-start-ur', title: 'Calming break: start (Urdu)', child: ALI_UR, render: (back) => <CalmingBreakScreen onDone={back} onExit={back} /> },
   { id: 'calm-breathing', title: 'Calming break: breathing', child: ALI, render: (back) => <CalmingBreakScreen initialStep="breathing" onDone={back} onExit={back} /> },
@@ -40,9 +41,9 @@ export const SCREENS = [
   { id: 'calm-ready', title: 'Calming break: ready to play', child: ALI, render: (back) => <CalmingBreakScreen initialStep="ready" onDone={back} onExit={back} /> },
 ];
 
-function SummarySample({ language, back }) {
+function SummarySample({ language, milestone = false, back }) {
   return <SafeAreaView style={styles.summary}>
-    <RoundSummary summary={{ stars: 10, correct: 5, practiced: 6, inconclusive: 1 }} language={language} onPlayAgain={back} onDone={back} />
+    <RoundSummary summary={{ stars: 10, correct: 5, practiced: 6, inconclusive: 1 }} language={language} milestone={milestone} onPlayAgain={back} onDone={back} />
   </SafeAreaView>;
 }
 

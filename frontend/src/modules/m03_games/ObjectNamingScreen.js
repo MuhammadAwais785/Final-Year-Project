@@ -16,6 +16,7 @@ import { cancelListening, listenForPrompt } from './playPrompt';
 import PromptCard from './PromptCard';
 import { applyResult, createRound, currentPromptId, pickPrompts, summarize } from './round';
 import RoundProgress from './RoundProgress';
+import * as defaultRewards from './rewardStore';
 import RoundSummary from './RoundSummary';
 import { recognizer as defaultRecognizer } from './speech';
 
@@ -33,6 +34,7 @@ export default function ObjectNamingScreen({
   roundSize = GAME.ROUND_SIZE,
   startStars = 0,
   now = Date.now,
+  rewards = defaultRewards,
   onDone,
   onExit,
 }) {
@@ -45,7 +47,10 @@ export default function ObjectNamingScreen({
   const [shownId, setShownId] = useState(() => currentPromptId(round));
   const [phase, setPhaseState] = useState(round.finished ? 'done' : 'listening');
   const [view, setView] = useState({ feedback: null, earned: 0 });
+  const [milestone, setMilestone] = useState(false);
   const roundRef = useRef(round);
+  const mountedRef = useRef(true); // no setState after unmount
+  const savedRoundRef = useRef(null); // the round whose stars are already saved
   const phaseRef = useRef(phase); // guards against a double tap before React re-renders
   const item = shownId ? objectItem(shownId) : null;
 
@@ -68,6 +73,23 @@ export default function ObjectNamingScreen({
     });
     return () => { active = false; };
   }, [phase, item, language, recognizer, now]);
+
+  useEffect(() => () => { mountedRef.current = false; }, []);
+
+  // Save the round's stars once when it ends (FR-6, FR-8). Keyed by the round object, so
+  // re-renders and a double tap on Done / Play again cannot add them twice.
+  const childId = child?._id;
+  useEffect(() => {
+    if (phase !== 'done' || !childId || savedRoundRef.current === round) return;
+    savedRoundRef.current = round;
+    const earned = summarize(round).stars;
+    if (earned <= 0) return;
+    const saved = round;
+    rewards.addStars(childId, earned, now()).then((result) => {
+      // only for this round: a late result must not show the badge on the next one
+      if (mountedRef.current && roundRef.current === saved && result?.milestoneJustReached) setMilestone(true);
+    }).catch(() => {}); // a storage failure must not break the summary
+  }, [phase, round, childId, rewards, now]);
 
   // A late answer must never reach a screen that is gone (BR-20: nothing is kept either).
   useEffect(() => () => cancelListening(recognizer), [recognizer]);
@@ -93,6 +115,7 @@ export default function ObjectNamingScreen({
     setRound(fresh);
     setShownId(currentPromptId(fresh));
     setView({ feedback: null, earned: 0 });
+    setMilestone(false);
     setPhase(fresh.finished ? 'done' : 'listening');
   };
 
@@ -122,7 +145,7 @@ export default function ObjectNamingScreen({
       </View>
 
       {phase === 'done'
-        ? <RoundSummary summary={summary} language={language} onPlayAgain={playAgain} onDone={onDone} />
+        ? <RoundSummary summary={summary} language={language} milestone={milestone} onPlayAgain={playAgain} onDone={onDone} />
         : <>
           {phase === 'correct' && <View style={styles.earned}>
             <Text style={[textStyle('label', language), styles.earnedText]}>{text.earned(view.earned)}</Text>
