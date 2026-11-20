@@ -28,14 +28,17 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-	  <!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The speech games listen to your child's words. Voice is processed only on this phone and never uploaded.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Optional mood monitoring uses the front camera to adjust the pace. Images are processed only on this phone and never saved or uploaded.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
@@ -74,5 +77,16 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>PlusJakartaSans-Medium.ttf</string>
+		<string>PlusJakartaSans-SemiBold.ttf</string>
+		<string>NotoNastaliqUrdu-Medium.ttf</string>
+		<string>PlusJakartaSans-Regular.ttf</string>
+		<string>NotoNastaliqUrdu-Bold.ttf</string>
+		<string>PlusJakartaSans-Bold.ttf</string>
+		<string>NotoNastaliqUrdu-Regular.ttf</string>
+		<string>PlusJakartaSans-ExtraBold.ttf</string>
+	</array>
 </dict>
 </plist>

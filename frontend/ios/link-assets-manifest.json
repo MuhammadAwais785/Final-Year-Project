@@ -1,0 +1,37 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/NotoNastaliqUrdu-Bold.ttf",
+      "sha1": "a6d374df9dbe4b78384982feca7fbe21c7ea380a"
+    },
+    {
+      "path": "src/assets/fonts/NotoNastaliqUrdu-Medium.ttf",
+      "sha1": "e89cbdd9762fd327164e7adbdf3f38136c242f45"
+    },
+    {
+      "path": "src/assets/fonts/NotoNastaliqUrdu-Regular.ttf",
+      "sha1": "01c56a897912a41f5ae615129a5f01bec20d2c8c"
+    },
+    {
+      "path": "src/assets/fonts/PlusJakartaSans-Bold.ttf",
+      "sha1": "606f1b32433c9b6902d97c657f9b3a2f89bab582"
+    },
+    {
+      "path": "src/assets/fonts/PlusJakartaSans-ExtraBold.ttf",
+      "sha1": "1f1ff730addefdfe324657b5db5056fb05b4b43b"
+    },
+    {
+      "path": "src/assets/fonts/PlusJakartaSans-Medium.ttf",
+      "sha1": "c328c76cab7078b89d925d73809f03c12a00143a"
+    },
+    {
+      "path": "src/assets/fonts/PlusJakartaSans-Regular.ttf",
+      "sha1": "ea07d33f23fb6c4856a642d035c463dc99a7f88a"
+    },
+    {
+      "path": "src/assets/fonts/PlusJakartaSans-SemiBold.ttf",
+      "sha1": "576ccf10be11652fc309f3682a327a98847c596e"
+    }
+  ]
+}

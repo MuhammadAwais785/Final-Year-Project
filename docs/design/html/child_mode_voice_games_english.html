@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<meta content="child_mode_home" name="screen-name">
+<title>Child Mode - Ali</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@300..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #FFF8F0;
+      }
+      body {
+        overscroll-behavior: none;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 16px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-cream": "#FFF8F0",
+            "dark-charcoal": "#2D3748",
+            "pastel-blue": "#A8DADC",
+            "pastel-blue-dark": "#1D4E68",
+            "pastel-peach": "#FFD6A5",
+            "pastel-peach-dark": "#7B3F00",
+            "pastel-mint": "#B9E4C9",
+            "pastel-mint-dark": "#155E3D",
+          },
+          borderRadius: {
+            '3xl': '24px',
+            '4xl': '32px',
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#FFF8F0] text-[#2D3748] min-h-screen flex flex-col justify-between select-none antialiased">
+<!-- Fixed Top Status & Child Header -->
+<header class="w-full pt-safe px-5 z-20">
+<!-- iOS Status Bar Mock -->
+<div class="h-6 flex items-center justify-between text-[#2D3748] opacity-80 pt-1">
+<span class="text-xs font-bold tracking-tight">09:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[15px]">wifi</span>
+<span class="material-symbols-outlined text-[17px]">battery_full</span>
+</div>
+</div>
+<!-- Child Mode App Bar: Child Name Tag on left, Stars Counter on right -->
+<div class="h-16 flex items-center justify-between mt-1">
+<!-- Child's Name Badge -->
+<div class="flex items-center gap-2.5 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.05)] border border-[#FFE7D1]">
+<div class="w-8 h-8 rounded-full bg-[#FFD6A5] flex items-center justify-center text-[#7B3F00]">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">face</span>
+</div>
+<div class="flex flex-col pr-1.5">
+<span class="text-[10px] font-bold uppercase tracking-wider text-[#9C6D3B] leading-none">Kid</span>
+<span class="text-lg font-extrabold text-[#2D3748] leading-tight">Ali</span>
+</div>
+</div>
+<!-- Star Counter Badge -->
+<div class="flex items-center gap-2 bg-[#FFECC7] px-4 py-2 rounded-full shadow-[0_4px_14px_rgba(230,140,20,0.12)] border border-[#FFDC99]"><span class="material-symbols-outlined text-[#E68A00] text-[22px]" style="font-variation-settings: &quot;FILL&quot; 1;">kid_star</span><span class="text-base font-extrabold text-[#754400] tracking-wide">12</span></div>
+</div>
+</header>
+<!-- Main Content Area: Mascot & Speech + Game Tiles -->
+<main class="flex-1 flex flex-col justify-center px-5 max-w-md mx-auto w-full py-2">
+<!-- Mascot Section with Speech Bubble -->
+<div class="relative flex flex-col items-center justify-center my-1">
+<!-- Speech bubble directly above Doctor -->
+<div class="relative z-10 bg-white px-6 py-3.5 rounded-[22px] shadow-[0_8px_20px_rgba(100,70,30,0.08)] border border-[#FFF0E0] mb-2 animate-bounce-subtle">
+<p class="text-xl font-extrabold text-[#2D3748] tracking-tight">Hello Ali! Let's play!</p>
+<!-- Speech Bubble Pointer -->
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r border-b border-[#FFF0E0]"></div>
+</div>
+<!-- Centered Doctor Mascot with mix-blend-mode for seamless integration on cream background -->
+<div class="relative w-48 h-48 sm:w-52 sm:h-52 flex items-center justify-center">
+<img alt="Friendly Doctor" class="w-full h-full object-contain mix-blend-multiply select-none pointer-events-none drop-shadow-sm" src="../assets/doctor.png">
+</div>
+</div>
+<!-- Game Action Tiles (Min 80dp tall, rounded-3xl / 24px, big full-tile touch target) -->
+<div class="flex flex-col gap-3.5 w-full mt-2">
+<!-- Tile 1: What is this? -->
+<button class="w-full min-h-[82px] h-[82px] px-5 rounded-3xl bg-[#A8DADC] active:scale-[0.98] active:brightness-95 transition-all shadow-[0_6px_16px_rgba(72,143,168,0.18)] flex items-center justify-between text-left group">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-white/90 flex items-center justify-center text-[#1D4E68] shadow-sm shrink-0">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">nutrition</span>
+</div>
+<span class="text-xl font-extrabold text-[#1D4E68] tracking-tight">What is this?</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-white/75 flex items-center justify-center text-[#1D4E68] shrink-0 group-hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-[24px]">arrow_forward</span>
+</div>
+</button>
+<!-- Tile 2: Colours -->
+<button class="w-full min-h-[82px] h-[82px] px-5 rounded-3xl bg-[#FFD6A5] active:scale-[0.98] active:brightness-95 transition-all shadow-[0_6px_16px_rgba(209,128,48,0.18)] flex items-center justify-between text-left group">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-white/90 flex items-center justify-center text-[#7B3F00] shadow-sm shrink-0">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">palette</span>
+</div>
+<span class="text-xl font-extrabold text-[#7B3F00] tracking-tight">Colours</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-white/75 flex items-center justify-center text-[#7B3F00] shrink-0 group-hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-[24px]">arrow_forward</span>
+</div>
+</button>
+<!-- Tile 3: Copy the sound -->
+<button class="w-full min-h-[82px] h-[82px] px-5 rounded-3xl bg-[#B9E4C9] active:scale-[0.98] active:brightness-95 transition-all shadow-[0_6px_16px_rgba(46,140,94,0.18)] flex items-center justify-between text-left group">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-white/90 flex items-center justify-center text-[#155E3D] shadow-sm shrink-0">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">hearing</span>
+</div>
+<span class="text-xl font-extrabold text-[#155E3D] tracking-tight">Copy the sound</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-white/75 flex items-center justify-center text-[#155E3D] shrink-0 group-hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-[24px]">arrow_forward</span>
+</div>
+</button>
+</div>
+</main>
+<!-- Bottom Child-Proof Adult Gate (WCAG 2.2 AA compliant contrast: #2D3748 on #F0E8DD) -->
+<footer class="w-full px-6 pt-3 pb-6 pb-safe flex flex-col items-center">
+<button class="relative overflow-hidden w-full max-w-xs min-h-[50px] py-2.5 px-5 rounded-full bg-[#EFE7DE] hover:bg-[#E7DED3] border border-[#DFCFC2] flex items-center justify-center gap-3 active:scale-95 transition-all shadow-sm select-none" id="exitBtn">
+<!-- Circular Progress Ring around Lock -->
+<div class="relative w-7 h-7 flex items-center justify-center shrink-0">
+<svg class="w-7 h-7 -rotate-90 pointer-events-none" viewBox="0 0 32 32">
+<circle class="stroke-[#D3C4B5]" cx="16" cy="16" fill="none" r="13" stroke-width="2.5"></circle>
+<circle class="stroke-[#2D3748]" cx="16" cy="16" fill="none" id="holdProgressCircle" r="13" stroke-dasharray="81.68" stroke-dashoffset="81.68" stroke-linecap="round" stroke-width="2.5" style="transition: stroke-dashoffset 0.2s ease-out; stroke-dashoffset: 81.68;"></circle>
+</svg>
+<span class="material-symbols-outlined text-[15px] absolute text-[#2D3748]" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<!-- Legible high-contrast 14px label -->
+<span class="text-[14px] font-bold text-[#2D3748] tracking-tight">
+        Grown-ups: hold to exit
+      </span>
+</button>
+</footer>
+<script>
+    // Child-proof Hold to Exit Handler
+    (function() {
+      const exitBtn = document.getElementById('exitBtn');
+      const progressCircle = document.getElementById('holdProgressCircle');
+      let holdTimer = null;
+      const totalCircumference = 81.68;
+      const requiredHoldDuration = 1800; // 1.8s hold
+
+      function triggerHaptic() {
+        if (window.navigator && window.navigator.vibrate) {
+          window.navigator.vibrate(30);
+        }
+      }
+
+      function startHold(e) {
+        progressCircle.style.transition = 'none';
+        progressCircle.style.strokeDashoffset = totalCircumference;
+        const startTime = Date.now();
+
+        clearInterval(holdTimer);
+        holdTimer = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const ratio = Math.min(elapsed / requiredHoldDuration, 1);
+          progressCircle.style.strokeDashoffset = totalCircumference * (1 - ratio);
+
+          if (ratio >= 1) {
+            clearInterval(holdTimer);
+            triggerHaptic();
+            const answer = prompt("Grown-up Security Gate:\nWhat is 3 + 4?");
+            if (answer && answer.trim() === "7") {
+              alert("Parent Portal Unlocked.");
+            }
+            progressCircle.style.strokeDashoffset = totalCircumference;
+          }
+        }, 20);
+      }
+
+      function resetHold() {
+        clearInterval(holdTimer);
+        progressCircle.style.transition = 'stroke-dashoffset 0.2s ease-out';
+        progressCircle.style.strokeDashoffset = totalCircumference;
+      }
+
+      if (exitBtn && progressCircle) {
+        exitBtn.addEventListener('mousedown', startHold);
+        exitBtn.addEventListener('touchstart', startHold, { passive: true });
+        exitBtn.addEventListener('mouseup', resetHold);
+        exitBtn.addEventListener('mouseleave', resetHold);
+        exitBtn.addEventListener('touchend', resetHold);
+        exitBtn.addEventListener('touchcancel', resetHold);
+      }
+    })();
+  </script>
+
+
+
+
+
+
+</body></html>
