@@ -9,6 +9,7 @@ import HomeScreen from '../modules/m01_onboarding/HomeScreen';
 import PinScreen from '../modules/m01_onboarding/PinScreen';
 import * as pinStore from '../modules/m01_onboarding/pinStore';
 import ChildHomeScreen from '../modules/m03_games/ChildHomeScreen';
+import ColourMatchingScreen from '../modules/m03_games/ColourMatchingScreen';
 import ObjectNamingScreen from '../modules/m03_games/ObjectNamingScreen';
 import RoundSummary from '../modules/m03_games/RoundSummary';
 import CalmingBreakScreen from '../modules/m07_intervention/CalmingBreakScreen';
@@ -32,6 +33,8 @@ export const SCREENS = [
   { id: 'child-home-ur', title: 'Child Mode home (Urdu)', child: ALI_UR, render: (back) => <ChildHomeScreen stars={12} onSelectGame={back} onExit={back} /> },
   { id: 'naming-en', title: 'Object naming game (English)', child: ALI, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
   { id: 'naming-ur', title: 'Object naming game (Urdu)', child: ALI_UR, render: (back) => <ObjectNamingScreen startStars={12} onDone={back} onExit={back} /> },
+  { id: 'colour-en', title: 'Colour matching game (English)', child: ALI, render: (back) => <ColourMatchingScreen startStars={12} onDone={back} onExit={back} /> },
+  { id: 'colour-ur', title: 'Colour matching game (Urdu)', child: ALI_UR, render: (back) => <ColourMatchingScreen startStars={12} onDone={back} onExit={back} /> },
   { id: 'naming-summary', title: 'Object naming summary', child: ALI, render: (back) => <SummarySample language="en" back={back} /> },
   { id: 'naming-milestone', title: 'Object naming summary with daily badge', child: ALI, render: (back) => <SummarySample language="en" milestone back={back} /> },
   { id: 'calm-start-en', title: 'Calming break: start (English)', child: ALI, render: (back) => <CalmingBreakScreen onDone={back} onExit={back} /> },

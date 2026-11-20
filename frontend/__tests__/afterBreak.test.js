@@ -1,5 +1,6 @@
 import { pickActivityAfterBreak } from '../src/modules/m07_intervention/afterBreak';
 import { easyRoundFor } from '../src/modules/m03_games/easyRound';
+import { colourItem } from '../src/modules/m03_games/colourContent';
 import { objectItem } from '../src/modules/m03_games/objectNamingContent';
 import { pickPrompts } from '../src/modules/m03_games/round';
 import { GAME } from '../src/utils/constants';
@@ -75,8 +76,14 @@ describe('easyRoundFor', () => {
     expect(new Set(picked).size).toBe(3);
   });
 
+  it('gives level-1 colour ids and a short round for colour matching', () => {
+    const round = easyRoundFor('colour_matching');
+    expect(round.roundSize).toBe(GAME.EASY_ROUND_SIZE);
+    expect(round.itemIds.length).toBeGreaterThanOrEqual(round.roundSize);
+    round.itemIds.forEach((id) => expect(colourItem(id).level).toBe(1));
+  });
+
   it('returns null for unknown or unbuilt activities', () => {
-    expect(easyRoundFor('colour_matching')).toBeNull();
     expect(easyRoundFor('nope')).toBeNull();
   });
 

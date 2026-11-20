@@ -1,14 +1,10 @@
+import { hintText, makeWordItem } from './itemShape';
+
 /**
  * Object Naming content (UC-11). BR-10: every target word has English and
- * Urdu script. Item shape is shared with colour matching (Task 10).
+ * Urdu script. Item shape is shared with colour matching (itemShape.js).
  */
-export const makeItem = (id, icon, en, ur, level = 1) => ({
-  id,
-  icon,
-  level,
-  en: { word: en.accepted[0], accepted: en.accepted, clue: en.clue },
-  ur: { word: ur.accepted[0], accepted: ur.accepted, clue: ur.clue },
-});
+export const makeItem = (id, icon, en, ur, level = 1) => ({ ...makeWordItem(id, en, ur, level), icon });
 
 export const OBJECT_NAMING = {
   version: 'v1',
@@ -37,14 +33,4 @@ export const objectItem = (id) => OBJECT_NAMING.items.find((i) => i.id === id);
 export const objectItemIds = (level = 1) =>
   OBJECT_NAMING.items.filter((i) => i.level === level).map((i) => i.id);
 
-/** Hint ladder (BR-12): 0 none, 1 clue, 2 first sound, 3+ say it with me. */
-export function hintText(item, language, level) {
-  if (!level || level < 1) return null;
-  const { word, clue } = item[language];
-  if (level === 1) return clue;
-  if (level === 2) {
-    const first = Array.from(word)[0];
-    return language === 'ur' ? `یہ "${first}" سے شروع ہوتا ہے۔` : `It starts with "${first}".`;
-  }
-  return language === 'ur' ? `میرے ساتھ بولیں: ${word}` : `Say it with me: ${word}`;
-}
+export { hintText };

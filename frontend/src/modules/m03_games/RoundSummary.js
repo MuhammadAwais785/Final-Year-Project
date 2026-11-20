@@ -8,8 +8,7 @@ import { NAMING_TEXT } from './objectNamingText';
 import { pickPraise } from './rewardText';
 
 /** End of a round (UI-4): praise, how many were named, stars earned, Play again / Done. */
-export default function RoundSummary({ summary, language, milestone = false, onPlayAgain, onDone }) {
-  const text = NAMING_TEXT[language];
+export default function RoundSummary({ summary, language, text = NAMING_TEXT[language], milestone = false, onPlayAgain, onDone }) {
   const [praise] = useState(() => pickPraise(language)); // picked once so it does not change on re-render
   return <View style={styles.wrap}>
     <DoctorAvatar size={170} language={language} />
