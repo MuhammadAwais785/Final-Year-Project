@@ -60,7 +60,7 @@ describe('ChildHomeScreen (UI-06)', () => {
     GAMES.forEach((game) => {
       ReactTestRenderer.act(() => root.findByProps({ testID: `game-${game.id}` }).props.onPress());
     });
-    expect(onSelectGame.mock.calls).toEqual([['objectNaming'], ['colourMatching'], ['soundImitation']]);
+    expect(onSelectGame.mock.calls).toEqual([['object_naming'], ['colour_matching'], ['sound_imitation']]);
   });
 
   test('has no bottom navigation: the hold button is the only way out', async () => {
