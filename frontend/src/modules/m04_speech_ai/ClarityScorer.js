@@ -60,20 +60,32 @@ export function scoreClarity(transcript, expectedWord) {
   // Exact match
   if (heard === target) return { score: 100, label: 'perfect' };
 
-  // Check each word in a multi-word transcript
+  // Check each word in a multi-word transcript — keep the BEST score across all words.
+  // (Early return caused "I see apple" → 'see' scored 40 before 'apple' was checked.)
+  let bestScore = 0;
+  let bestLabel = 'no_match';
+
   const words = heard.split(/\s+/);
   for (const w of words) {
-    if (w === target) return { score: 100, label: 'perfect' };
-    if (w.startsWith(target) || target.startsWith(w))
-      return { score: 85, label: 'good' };
-    if (w.includes(target) || target.includes(w))
-      return { score: 70, label: 'good' };
-    const dist = editDistance(w, target);
-    if (dist <= 2) return { score: 60, label: 'good' };
-    if (dist <= 4) return { score: 40, label: 'try_again' };
+    let score = 0;
+    if (w === target)                                   score = 100;
+    else if (w.startsWith(target) || target.startsWith(w)) score = 85;
+    else if (w.includes(target)   || target.includes(w))   score = 70;
+    else {
+      const dist = editDistance(w, target);
+      if (dist <= 2) score = 60;
+      else if (dist <= 4) score = 40;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      if      (score === 100) bestLabel = 'perfect';
+      else if (score >= 60)   bestLabel = 'good';
+      else if (score >= 40)   bestLabel = 'try_again';
+    }
+    if (bestScore === 100) break; // perfect — no need to check further
   }
 
-  return { score: 0, label: 'no_match' };
+  return { score: bestScore, label: bestLabel };
 }
 
 /** Human-readable feedback text for a score label (bilingual). */

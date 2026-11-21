@@ -129,19 +129,17 @@ function createMock() {
    * @param {'en'|'ur'}  opts.language
    * @param {number}     opts.listenMs      - how long to wait (games use ~6000)
    * @returns {Promise<{ heard, confidence, score, status }>}
+   *
+   * Intentionally NOT async so cancel() can interrupt synchronously.
+   * Mic permission is checked in the background after pending is set.
    */
-  async function recognize({ acceptedAnswers = [], listenMs = SPEECH.LISTEN_MS } = {}) {
+  function recognize({ acceptedAnswers = [], listenMs = SPEECH.LISTEN_MS } = {}) {
     // One listen at a time — an earlier pending call resolves as no_response
     cancel();
 
-    // Mic permission check (README rule, HI-1). Cache result after first grant.
-    // In Jest (no native modules) requestMicrophone resolves to 'granted' automatically (iOS path).
-    if (micGranted === null) {
-      const result = await requestMicrophone();
-      micGranted = result === 'granted';
-    }
-    if (!micGranted) {
-      return buildResult('no_response', []);
+    // Mic already known denied — resolve immediately
+    if (micGranted === false) {
+      return Promise.resolve(buildResult('no_response', []));
     }
 
     const outcome = nextOutcome ?? 'no_response';
@@ -156,6 +154,16 @@ function createMock() {
         resolve(buildResult(outcome, acceptedAnswers));
       }, wait);
       pending = { timer, resolve, answers: acceptedAnswers };
+
+      // Mic permission check async (README rule, HI-1).
+      // If denied, cancel the pending listen immediately.
+      // micGranted=null means first call — check now; micGranted=true means already cached.
+      if (micGranted === null) {
+        requestMicrophone().then((result) => {
+          micGranted = result === 'granted';
+          if (!micGranted) settle('no_response');
+        });
+      }
     });
   }
 

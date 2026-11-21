@@ -13,11 +13,21 @@
 // Mock __DEV__ global (React Native sets this; Jest does not)
 global.__DEV__ = true;
 
+// Mock permissions util — mic is always granted in tests (no native modules in Jest)
+jest.mock('../src/utils/permissions', () => ({
+  requestMicrophone: jest.fn().mockResolvedValue('granted'),
+}));
+
+// Mock constants — provide SPEECH values without React Native
+jest.mock('../src/utils/constants', () => ({
+  SPEECH: { LISTEN_MS: 6000, CONFIDENCE_MIN: 0.6, SCORE_PASS: 60 },
+}));
+
 // We re-import inside each test so the mock resets cleanly
 let mod;
 beforeEach(() => {
   jest.resetModules();
-  mod = require('../m04_speech_ai/mockRecognizer');
+  mod = require('../src/modules/m04_speech_ai/mockRecognizer');
 });
 
 describe('speechRecognizer — status rules', () => {
