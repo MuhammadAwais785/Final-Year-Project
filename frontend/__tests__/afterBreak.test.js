@@ -3,7 +3,8 @@ import { easyRoundFor } from '../src/modules/m03_games/easyRound';
 import { colourItem } from '../src/modules/m03_games/colourContent';
 import { objectItem } from '../src/modules/m03_games/objectNamingContent';
 import { pickPrompts } from '../src/modules/m03_games/round';
-import { GAME } from '../src/utils/constants';
+import { ACTIVITIES, GAME, LEVELS } from '../src/utils/constants';
+import { GAMES } from '../src/modules/m03_games/ChildHomeScreen';
 
 const act = (id, level, available = true) => ({ id, level, available });
 
@@ -91,5 +92,18 @@ describe('easyRoundFor', () => {
     const a = easyRoundFor('object_naming');
     a.itemIds.pop();
     expect(easyRoundFor('object_naming').itemIds.length).toBeGreaterThan(a.itemIds.length);
+  });
+});
+
+describe('shared activity ids (M-03, M-06, M-07)', () => {
+  it('the home tiles, the easy round and the break picker use the same ids', () => {
+    expect(GAMES.map((g) => g.id)).toEqual(Object.values(ACTIVITIES));
+    [ACTIVITIES.OBJECT_NAMING, ACTIVITIES.COLOUR_MATCHING].forEach((id) => expect(easyRoundFor(id)).not.toBeNull());
+    const activities = GAMES.map((g) => ({ id: g.id, available: g.id !== ACTIVITIES.SOUND_IMITATION, level: 1 }));
+    expect(pickActivityAfterBreak({ stressedActivity: ACTIVITIES.OBJECT_NAMING, activities })).toBe(ACTIVITIES.COLOUR_MATCHING);
+  });
+
+  it('levels are numbers in order, matching the content files', () => {
+    expect(LEVELS).toEqual([1, 2, 3]);
   });
 });
