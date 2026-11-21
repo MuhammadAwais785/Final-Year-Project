@@ -8,6 +8,14 @@ export const MODULES = ['m01_onboarding', 'm02_avatar', 'm03_games', 'm04_speech
 // move on after 5 tries (UC-5 E2), stars 2 / 1 with a hint (BR-11, BR-13), listen 6s (FR-11), short easy round of 3 after a calming break (BR-28).
 // DAILY_MILESTONE_STARS: still to be confirmed with the supervisor (FR-8).
 export const GAME = { ROUND_SIZE: 6, HINT_AFTER_FAILS: 2, MAX_HINT_LEVEL: 3, MAX_ATTEMPTS: 5, STARS_CORRECT: 2, STARS_WITH_HINT: 1, LISTEN_MS: 6000, EASY_ROUND_SIZE: 3, DAILY_MILESTONE_STARS: 10 };
+// Speech recogniser thresholds (M04, TBD-03). Values are starting points; supervisor to confirm.
+// CONFIDENCE_MIN: below this → inconclusive (BR-22). SCORE_PASS: below this → incorrect (BR-23).
+export const SPEECH = { LISTEN_MS: 6000, CONFIDENCE_MIN: 0.6, SCORE_PASS: 60 };
+// Difficulty / level locking (M06, BR-14). PROMOTE_AFTER_CORRECT: correct-in-a-row before promoting.
+export const DIFFICULTY = { PROMOTE_AFTER_CORRECT: 3 };
+// Break trigger (M07, BR-27, TBD-04). WINDOW_MS: sustained-stress window. STRESS_THRESHOLD: 0–1.
+// MIN_SAMPLES: minimum indicator snapshots in the window before we can trigger.
+export const BREAK = { WINDOW_MS: 10000, STRESS_THRESHOLD: 0.65, MIN_SAMPLES: 3 };
 // Goals (FR-3): at most MAX goals per child (BR-7). BR-8 is not described in DESIGN.md or next-tasks.md, so no rule is built on it yet.
 // The word and minute ranges are our own guesses: to confirm with supervisor.
 export const GOALS = { MAX: 5, WORDS_MIN: 1, WORDS_MAX: 50, MINUTES_MIN: 5, MINUTES_MAX: 30 };
