@@ -19,3 +19,9 @@ export const BREAK = { WINDOW_MS: 10000, STRESS_THRESHOLD: 0.65, MIN_SAMPLES: 3 
 // Goals (FR-3): at most MAX goals per child (BR-7). BR-8 is not described in DESIGN.md or next-tasks.md, so no rule is built on it yet.
 // The word and minute ranges are our own guesses: to confirm with supervisor.
 export const GOALS = { MAX: 5, WORDS_MIN: 1, WORDS_MAX: 50, MINUTES_MIN: 5, MINUTES_MAX: 30 };
+// Sound Imitation scoring thresholds (M04, BR-16 "stricter matching at phoneme level").
+// PHONEME_PASS: easiest level (child repeats a single sound, e.g. "aaa").
+// SYLLABLE_PASS: mid level (e.g. "ap" from "apple").
+// WORD_PASS: hardest level — same as SPEECH.SCORE_PASS (full word match).
+// Fasih: BR-16 mein phoneme level 40 rakha hai (naram), word level 60 (strict). Supervisor se confirm karna hai.
+export const IMITATION = { PHONEME_PASS: 40, SYLLABLE_PASS: 50, WORD_PASS: 60 };

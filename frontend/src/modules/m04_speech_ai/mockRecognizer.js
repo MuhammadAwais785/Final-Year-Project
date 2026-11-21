@@ -1,5 +1,5 @@
 /**
- * M04 — Speech AI: Mock recogniser (replaces m03_games/mockRecognizer)
+ * M04 — Speech AI: Mock recogniser
  *
  * Implements the full M04 contract (README.md).
  * No audio is ever recorded, stored or logged (BR-20, SEC-1).
@@ -15,13 +15,17 @@
  * (capped at 1 500 ms in dev/test so nothing waits the full 6 s).
  *
  * Status rules (apply in this order — README §Status rule):
- *   no_response  — nothing heard within listenMs
- *   inconclusive — confidence < CONFIDENCE_MIN
- *   recognized   — heard matches an accepted answer AND score >= SCORE_PASS
+ *   no_response  — nothing heard within listenMs OR mic permission not granted
+ *   inconclusive — confidence < CONFIDENCE_MIN (BR-22)
+ *   recognized   — heard matches an accepted answer AND score >= SCORE_PASS (BR-23)
  *   incorrect    — anything else
+ *
+ * Mic permission (README rule): requestMicrophone() is called before first listen.
+ * If not granted → no_response immediately (never tries to record).
  */
 
 import { SPEECH } from '../../utils/constants';
+import { requestMicrophone } from '../../utils/permissions';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -90,8 +94,9 @@ function buildResult(status, acceptedAnswers) {
 // ─── Mock recogniser factory ─────────────────────────────────────────────────
 
 function createMock() {
-  let pending = null;      // { timer, resolve }
+  let pending = null;      // { timer, resolve, answers }
   let nextOutcome = null;  // set by simulate()
+  let micGranted = null;   // cached: null = not checked yet, true/false after first check
 
   /** Resolve and clear any pending call. */
   function settle(status, acceptedAnswers) {
@@ -125,9 +130,19 @@ function createMock() {
    * @param {number}     opts.listenMs      - how long to wait (games use ~6000)
    * @returns {Promise<{ heard, confidence, score, status }>}
    */
-  function recognize({ acceptedAnswers = [], listenMs = SPEECH.LISTEN_MS } = {}) {
+  async function recognize({ acceptedAnswers = [], listenMs = SPEECH.LISTEN_MS } = {}) {
     // One listen at a time — an earlier pending call resolves as no_response
     cancel();
+
+    // Mic permission check (README rule, HI-1). Cache result after first grant.
+    // In Jest (no native modules) requestMicrophone resolves to 'granted' automatically (iOS path).
+    if (micGranted === null) {
+      const result = await requestMicrophone();
+      micGranted = result === 'granted';
+    }
+    if (!micGranted) {
+      return buildResult('no_response', []);
+    }
 
     const outcome = nextOutcome ?? 'no_response';
     nextOutcome = null;

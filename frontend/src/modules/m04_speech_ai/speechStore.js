@@ -1,10 +1,14 @@
 /**
  * M04 — Speech AI: Session store
  *
- * Saves and loads speech session results to AsyncStorage so the parent
- * dashboard (M09) and reports (M10) can read them later.
+ * NOTE (Fasih's review): Speech module sirf result return karta hai — kuch save nahi karta.
+ * Game session save karna M09 dashboard / M08 sync ka kaam hai (Task 5, Awais).
+ * Agar M04 bhi save kare to ek hi data do jagah save hoga.
  *
- * Data shape per session:
+ * Yeh file ab sirf ek thin helper export karti hai jo M09/M10 chahein to use kar sakti hain,
+ * lekin `mockRecognizer` ya `index.js` isko call nahi karte.
+ *
+ * Data shape (for M09/M10 reference):
  * {
  *   id:          string    - unique key
  *   childId:     string    - child profile id
@@ -32,7 +36,10 @@ export async function loadSessions() {
   }
 }
 
-/** Save a new session result. */
+/**
+ * Save a new session result.
+ * Called by M09 dashboard / M08 sync — NOT by M04 speech module itself.
+ */
 export async function saveSession(session) {
   try {
     const all = await loadSessions();
