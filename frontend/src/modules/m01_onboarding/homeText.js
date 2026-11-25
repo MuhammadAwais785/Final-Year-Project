@@ -1,4 +1,4 @@
-/** Home screen wording in English and Urdu (UI-1, UI-8). English mode shows both lines; Urdu mode shows Urdu only. */
+/** Home screen wording in English and Urdu (UI-1, UI-8). One language per screen. */
 export const HOME_TEXT = {
   en: {
     appName: 'Silent Screen',

@@ -124,9 +124,10 @@ describe('PIN in Urdu', () => {
     expect(onUnlocked).toHaveBeenCalled();
   });
 
-  test('English keeps both languages', async () => {
+  test('English shows English only', async () => {
     const { texts } = await render(<PinScreen store={fakeStore()} language="en" />);
-    expect(texts()).toEqual(expect.arrayContaining([PIN_TEXT.en.verify, PIN_TEXT.ur.verify, 'Delete']));
+    expect(texts()).toEqual(expect.arrayContaining([PIN_TEXT.en.verify, 'Delete']));
+    expect(texts()).not.toContain(PIN_TEXT.ur.verify);
   });
 });
 
@@ -187,8 +188,8 @@ describe('Baseline in Urdu', () => {
     [t.title, t.task(1, 2), t.attempt(1, 3), t.ask].forEach((x) => expect(texts()).toContain(x));
     // Buttons and the link carry a leading icon.
     [t.said, t.tryAgain, t.skip, t.later].forEach((x) => expect(texts().some((y) => y.endsWith(x))).toBe(true));
-    expect(texts()).toContain(`${t.answer}: سیب`);
-    expect(texts()).toContain('apple');
+    expect(texts()).toEqual(expect.arrayContaining([`${t.answer}:`, 'سیب']));
+    expect(texts()).not.toContain('apple');
     expectSeparateScripts(root);
   });
 

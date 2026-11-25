@@ -66,7 +66,6 @@ export default function BaselineScreen({ childId, checklist = BASELINE_CHECKLIST
 
   const task = checklist.tasks.find((x) => x.id === currentTaskId(baseline));
   const percent = progressPercent(baseline);
-  const other = language === 'ur' ? 'en' : 'ur';
 
   return <SafeAreaView style={styles.screen}>
     <ScreenHeader title={t.title} onBack={onBack} language={ui} />
@@ -85,19 +84,10 @@ export default function BaselineScreen({ childId, checklist = BASELINE_CHECKLIST
       {task && <View style={styles.card}>
         <View style={styles.picture}><Text style={styles.icon}>{task.icon}</Text></View>
         <Text style={[textStyle('headlineSm', ui), styles.text, styles.centred]}>{t.ask}</Text>
-        {/* Each script in its own Text: Urdu needs a taller line than English or it is clipped. */}
+        {/* Label in the parent's language, then only the word the child should say, each script in its own Text. */}
         <View style={[styles.answer, flip]}>
-          {urdu
-            ? <>
-              <Text style={[textStyle('label', 'ur'), styles.muted]}>{language === 'ur' ? `${t.answer}: ${task.word.ur}` : `${t.answer}:`}</Text>
-              {language === 'en' && <Text style={[textStyle('label'), styles.muted]}>{task.word.en}</Text>}
-              {language === 'en' && <Text style={[textStyle('label', 'ur'), styles.muted]}>{task.word.ur}</Text>}
-              {language === 'ur' && <Text style={[textStyle('label'), styles.muted]}>{task.word.en}</Text>}
-            </>
-            : <>
-              <Text style={[textStyle('label', language), styles.muted]}>{t.answer}: {task.word[language]}</Text>
-              <Text style={[textStyle('label', other), styles.muted]}>{task.word[other]}</Text>
-            </>}
+          <Text style={[textStyle('label', ui), styles.muted]}>{t.answer}:</Text>
+          <Text style={[textStyle('label', language), styles.muted]}>{task.word[language]}</Text>
         </View>
       </View>}
 

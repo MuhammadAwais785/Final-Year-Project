@@ -1,6 +1,5 @@
 /**
- * Parent PIN wording in English and Urdu (UC-22, UC-23, UI-8). English mode shows each message in both
- * languages, as in the design; Urdu mode shows Urdu only. PIN digits stay Western in both (keypad is predictable).
+ * Parent PIN wording in English and Urdu (UC-22, UC-23, UI-8). One language per screen (the parent's). PIN digits stay Western in both (keypad is predictable).
  */
 export const PIN_TEXT = {
   en: {

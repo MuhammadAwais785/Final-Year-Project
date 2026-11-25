@@ -97,14 +97,13 @@ export default function PinScreen({ store, onUnlocked, onBack, onForgotPin, now 
         {onBack && <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel={t.back} style={styles.backPill}>
           {urdu
             ? <><Text style={[textStyle('label', 'ur'), styles.primaryText]}>{t.back}</Text><Text style={[textStyle('label'), styles.primaryText]}> →</Text></>
-            : <><Text style={[textStyle('label'), styles.primaryText]}>← {PIN_TEXT.en.back} / </Text><Text style={[textStyle('label', 'ur'), styles.primaryText]}>{PIN_TEXT.ur.back}</Text></>}
+            : <Text style={[textStyle('label'), styles.primaryText]}>← {t.back}</Text>}
         </Pressable>}
         <View style={styles.shield}><Text style={styles.shieldIcon}>{'\u{1F6E1}︎'}</Text></View>
       </View>
 
       <View style={styles.header}>
-        {!urdu && <Text accessibilityRole="header" style={[textStyle('headlineMd'), styles.title]}>{PIN_TEXT.en[mode]}</Text>}
-        <Text accessibilityRole={urdu ? 'header' : undefined} style={[textStyle('headlineMd', 'ur'), styles.title, styles.centred]}>{PIN_TEXT.ur[mode]}</Text>
+        <Text accessibilityRole="header" style={[textStyle('headlineMd', lang), styles.title]}>{t[mode]}</Text>
         <Text style={[textStyle('body', lang), styles.subtitle]}>{t.subtitle}</Text>
       </View>
 
@@ -113,16 +112,14 @@ export default function PinScreen({ store, onUnlocked, onBack, onForgotPin, now 
           {Array.from({ length: PIN.LENGTH }, (_, i) => <View key={i} testID="pin-dot" style={[styles.dot, i < entry.length && styles.dotFilled]} />)}
         </View>
         {shown && <View style={styles.banner} accessibilityLiveRegion="polite">
-          {!urdu && <Text style={[textStyle('label'), styles.bannerText]}>⚠ {line(shown, 'en')}</Text>}
-          <Text style={[textStyle('body', 'ur'), styles.bannerText]}>{urdu ? '⚠ ' : ''}{line(shown, 'ur')}</Text>
+          <Text style={[textStyle('body', lang), styles.bannerText]}>⚠ {line(shown, lang)}</Text>
         </View>}
       </View>
 
       <PinKeypad onDigit={pressDigit} onDelete={() => setEntry((e) => e.slice(0, -1))} disabled={locked} language={lang} />
 
       {mode === 'verify' && onForgotPin && <Pressable onPress={onForgotPin} accessibilityRole="link" style={styles.forgot}>
-        {!urdu && <Text style={[textStyle('label'), styles.link]}>{PIN_TEXT.en.forgot}</Text>}
-        <Text style={[textStyle('body', 'ur'), styles.primaryText, styles.centred, urdu && styles.link]}>{PIN_TEXT.ur.forgot}</Text>
+        <Text style={[textStyle('body', lang), styles.link, styles.centred]}>{t.forgot}</Text>
       </Pressable>}
     </ScrollView>
   </SafeAreaView>;
