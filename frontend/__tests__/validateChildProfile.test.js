@@ -1,4 +1,5 @@
 import { validateChildProfile } from '../src/modules/m01_onboarding/validateChildProfile';
+import { CHILD_NAME_MAX_LENGTH } from '../src/utils/constants';
 
 // SRS Appendix B.1 test data (TD-01 to TD-06)
 describe('validateChildProfile (FR-1)', () => {
@@ -31,5 +32,17 @@ describe('validateChildProfile (FR-1)', () => {
   test('trims the name and reports all invalid fields together', () => {
     expect(validateChildProfile({ name: '  Zara ', age: 5, language: 'ur' }).value.name).toBe('Zara');
     expect(Object.keys(validateChildProfile({ name: '', age: 9 }).errors)).toEqual(['name', 'age', 'language']);
+  });
+  test('name length limit: 30 characters is accepted, 31 is rejected (also in Urdu)', () => {
+    const ok = 'a'.repeat(CHILD_NAME_MAX_LENGTH);
+    expect(validateChildProfile({ name: ok, age: 5, language: 'en' }).ok).toBe(true);
+    const tooLong = validateChildProfile({ name: `${ok}b`, age: 5, language: 'en' });
+    expect(tooLong.ok).toBe(false);
+    expect(tooLong.errors.name).toMatch(/30/);
+    expect(validateChildProfile({ name: 'ب'.repeat(CHILD_NAME_MAX_LENGTH + 1), age: 5, language: 'ur' }, 'ur').errors.name).toMatch(/30/);
+  });
+
+  test('spaces around a name do not count towards the limit', () => {
+    expect(validateChildProfile({ name: `  ${'a'.repeat(CHILD_NAME_MAX_LENGTH)}  `, age: 5, language: 'en' }).ok).toBe(true);
   });
 });
