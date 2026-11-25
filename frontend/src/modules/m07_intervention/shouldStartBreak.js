@@ -5,8 +5,10 @@
  * stress/frustration indicators from M05 vision (BR-27, FR-15).
  *
  * Rules:
- *   • Only trigger when stress stays ABOVE the threshold for a
+ *   • Only trigger when stress stays at or above the threshold for a
  *     SUSTAINED window — not on a single spike (BR-27).
+ *   • The samples must also span most (80%) of the window, so a burst of
+ *     readings close together in time is not treated as sustained.
  *   • The window size and threshold live in constants.js (TBD-04).
  *   • When a break is needed, also record WHICH activity caused the
  *     stress so CalmingBreakScreen can route to an easier game after.
@@ -21,7 +23,7 @@
  *   Must be sorted oldest-first. Pass the last N seconds only (see BREAK.WINDOW_MS).
  *
  * @param {string} currentActivity
- *   The game id currently being played (e.g. 'objectNaming').
+ *   The game id currently being played (one of the ACTIVITIES values, e.g. ACTIVITIES.OBJECT_NAMING).
  *   Stored as stressedActivity so the post-break routing can avoid it.
  *
  * @returns {{ startBreak: boolean, stressedActivity: string|null }}
@@ -30,7 +32,7 @@
 import { BREAK } from '../../utils/constants';
 
 export function shouldStartBreak(recentIndicators = [], currentActivity = null) {
-  // Need at least a full window of data before making a call
+  // No data yet
   if (!recentIndicators || recentIndicators.length === 0) {
     return { startBreak: false, stressedActivity: null };
   }
@@ -38,24 +40,26 @@ export function shouldStartBreak(recentIndicators = [], currentActivity = null) 
   const windowMs  = BREAK.WINDOW_MS;        // e.g. 10 000 ms
   const threshold = BREAK.STRESS_THRESHOLD; // e.g. 0.65
 
-  const now     = recentIndicators[recentIndicators.length - 1].at;
+  const sorted  = [...recentIndicators].sort((a, b) => a.at - b.at);
+  const now     = sorted[sorted.length - 1].at;
   const cutoff  = now - windowMs;
 
   // Only look at indicators inside the window
-  const window = recentIndicators.filter((r) => r.at >= cutoff);
+  const window = sorted.filter((r) => r.at >= cutoff);
 
   if (window.length < BREAK.MIN_SAMPLES) {
     // Not enough data yet — don't trigger
     return { startBreak: false, stressedActivity: null };
   }
 
+  // The samples must cover most of the window, not just a short burst
+  const span = now - window[0].at;
+  if (span < BREAK.WINDOW_MS * BREAK.MIN_SPAN_RATIO) return { startBreak: false, stressedActivity: null };
+
   // All samples in the window must be above the threshold (sustained, not a spike)
   const allAbove = window.every((r) => r.stress >= threshold);
 
   if (allAbove) {
-    console.log(
-      `[M07] shouldStartBreak: sustained stress ≥ ${threshold} for ${window.length} samples → break`,
-    );
     return { startBreak: true, stressedActivity: currentActivity };
   }
 

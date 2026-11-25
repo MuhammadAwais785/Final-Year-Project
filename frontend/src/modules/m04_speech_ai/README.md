@@ -49,7 +49,7 @@ Compare words after normalising: lower case, trimmed, punctuation removed. For U
 
 ## The mock (first task)
 
-The mock follows the same interface. It waits `listenMs`, then returns `no_response`, unless a test or the dev screen gallery calls `simulate()` first:
+The mock follows the same interface. It waits `listenMs`, then returns `recognized`, unless a test or the dev screen gallery calls `simulate()` first:
 
 ```js
 mockRecognizer.simulate('correct' | 'wrong' | 'unclear' | 'silence');
@@ -63,6 +63,6 @@ Add unit tests for the status rule (SRS Appendix B.2: TD-07 to TD-11).
 | Module | Owner | Interface | Rules |
 | --- | --- | --- | --- |
 | M05 Vision | Abdullah | `subscribeIndicators(callback)` returns `unsubscribe`; callback receives `{ stress, frustration, boredom, confidence, at }`, each 0–1 | Start only if the child's consent has `cameraAllowed: true` (`m01_onboarding/consentStore.js`, BR-24). Stop at once when it is turned off. Never store or upload frames (BR-25). |
-| M06 Difficulty | Abdullah | `nextDifficulty(history)` → level | Up one step after 3 correct in a row, only between rounds (BR-14). Start from the baseline level (BR-4). Log every change. |
-| M07 Trigger | Abdullah | `shouldStartBreak(recentIndicators)` → boolean | Only when stress stays above the threshold for a sustained time, not one spike (BR-27). |
+| M06 Difficulty | Abdullah | `nextDifficulty(history)` → level | Up one step after 3 correct in a row, only between rounds (BR-14). Start at level 1 or the last played level. Levels are the numbers in `LEVELS`. |
+| M07 Trigger | Abdullah | `shouldStartBreak(recentIndicators)` → `{ startBreak, stressedActivity }` | Only when stress stays above the threshold for a sustained time, not one spike (BR-27). |
 | M07 Screens | Fasih | Calming break screens | Already designed in `docs/design/screens/calming_break_*`. |

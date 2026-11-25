@@ -5,30 +5,27 @@
  * have been unlocked (BR-14, BR-4, FR-14).
  *
  * Rules:
- *   • Start from the child's baseline level (stored in baselineStore).
+ *   • Start at level 1, or at the last level played (the baseline is not used here).
  *   • Promote one step after PROMOTE_AFTER_CORRECT correct answers IN A ROW.
  *   • Only promote between rounds, never mid-round (BR-14).
  *   • Never demote — once a level is unlocked it stays unlocked.
- *   • Log every change (console.log is fine until M10 dashboard lands).
  *
- * Levels: 'easy' → 'medium' → 'hard'
+ * Levels are the numbers in LEVELS (constants.js): 1 → 2 → 3
  *
  * Usage:
  *   const { level, unlocked } = nextDifficulty(childId, activity, history);
  *   // level    — the level to play next
- *   // unlocked — array of levels unlocked so far, e.g. ['easy', 'medium']
+ *   // unlocked — array of levels unlocked so far, e.g. [1, 2]
  *
  * @param {string}   childId   - child profile id
- * @param {string}   activity  - game id, e.g. 'objectNaming' | 'colourMatching'
+ * @param {string}   activity  - game id, one of the ACTIVITIES values (constants.js)
  * @param {object[]} history   - recent round results:
- *                               [{ correct: boolean, level: string }, ...]
+ *                               [{ correct: boolean, level: number }, ...]
  *                               Most-recent entry LAST.
- * @returns {{ level: string, unlocked: string[] }}
+ * @returns {{ level: number, unlocked: number[] }}
  */
 
-import { DIFFICULTY } from '../../utils/constants';
-
-const LEVELS = ['easy', 'medium', 'hard'];
+import { DIFFICULTY, LEVELS } from '../../utils/constants';
 
 /** How many correct-in-a-row before we promote (from constants). */
 const PROMOTE_AFTER = DIFFICULTY.PROMOTE_AFTER_CORRECT; // default 3
@@ -51,16 +48,16 @@ function trailingCorrect(history, currentLevel) {
  * Derive which levels are already unlocked from the history.
  * A level is unlocked if the child has ever played at it.
  */
-function derivedUnlocked(history, baselineLevel) {
-  const seen = new Set([baselineLevel]);
+function derivedUnlocked(history, startLevel) {
+  const seen = new Set([startLevel]);
   history.forEach((r) => seen.add(r.level));
   return LEVELS.filter((l) => seen.has(l));
 }
 
 export function nextDifficulty(childId, activity, history = []) {
-  // Determine current level from the last history entry, else start at easy
+  // Determine current level from the last history entry, else start at level 1
   const lastEntry = history.length > 0 ? history[history.length - 1] : null;
-  const currentLevel = lastEntry?.level ?? 'easy';
+  const currentLevel = lastEntry?.level ?? LEVELS[0];
   const currentIdx   = LEVELS.indexOf(currentLevel);
 
   const unlocked = derivedUnlocked(history, currentLevel);
@@ -74,9 +71,6 @@ export function nextDifficulty(childId, activity, history = []) {
     if (!unlocked.includes(nextLevel)) {
       unlocked.push(nextLevel);
     }
-    console.log(
-      `[M06] ${childId}/${activity}: promoted ${currentLevel} → ${nextLevel} after ${streak} correct in a row`,
-    );
     return { level: nextLevel, unlocked };
   }
 

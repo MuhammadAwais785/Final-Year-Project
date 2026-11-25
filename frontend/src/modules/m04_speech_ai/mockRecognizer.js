@@ -11,8 +11,9 @@
  *   speechRecognizer.simulate('unclear');   // → inconclusive
  *   speechRecognizer.simulate('silence');   // → no_response
  *
- * Without a simulate() call it returns no_response after listenMs
- * (capped at 1 500 ms in dev/test so nothing waits the full 6 s).
+ * Without a simulate() call it returns 'recognized' after listenMs
+ * (capped at 1 500 ms in dev/test so nothing waits the full 6 s), so the
+ * real app's games can be played.
  *
  * Status rules (apply in this order — README §Status rule):
  *   no_response  — nothing heard within listenMs OR mic permission not granted
@@ -24,34 +25,8 @@
  * If not granted → no_response immediately (never tries to record).
  */
 
-import { SPEECH } from '../../utils/constants';
+import { GAME } from '../../utils/constants';
 import { requestMicrophone } from '../../utils/permissions';
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-/**
- * Normalise a word for comparison:
- *   • lowercase + trim + strip punctuation
- *   • Arabic/Urdu diacritics removed
- *   • Urdu letter unification: ي→ی, ك→ک, ه→ہ
- */
-function normalise(word) {
-  if (!word) return '';
-  return word
-    .toLowerCase()
-    .replace(/[\u064B-\u065F]/g, '')          // Arabic/Urdu diacritics
-    .replace(/\u064A/g, '\u06CC')             // ي → ی
-    .replace(/\u0643/g, '\u06A9')             // ك → ک
-    .replace(/\u0647/g, '\u06C1')             // ه → ہ
-    .replace(/[^\w\u0600-\u06FF\s]/g, '')     // strip other punctuation
-    .trim();
-}
-
-/** True if `heard` matches any of the accepted answers (normalised). */
-function matchesAny(heard, acceptedAnswers) {
-  const h = normalise(heard);
-  return acceptedAnswers.some((a) => normalise(a) === h);
-}
 
 // ─── Mock outcomes ───────────────────────────────────────────────────────────
 
@@ -133,7 +108,7 @@ function createMock() {
    * Intentionally NOT async so cancel() can interrupt synchronously.
    * Mic permission is checked in the background after pending is set.
    */
-  function recognize({ acceptedAnswers = [], listenMs = SPEECH.LISTEN_MS } = {}) {
+  function recognize({ acceptedAnswers = [], listenMs = GAME.LISTEN_MS } = {}) {
     // One listen at a time — an earlier pending call resolves as no_response
     cancel();
 
@@ -142,11 +117,11 @@ function createMock() {
       return Promise.resolve(buildResult('no_response', []));
     }
 
-    const outcome = nextOutcome ?? 'no_response';
+    const outcome = nextOutcome ?? 'recognized';
     nextOutcome = null;
 
     // In dev/test cap the wait so nothing hangs for 6 s
-    const wait = __DEV__ ? Math.min(listenMs, 1500) : listenMs; // eslint-disable-line no-undef
+    const wait = __DEV__ ? Math.min(listenMs, 1500) : listenMs;
 
     return new Promise((resolve) => {
       const timer = setTimeout(() => {
@@ -162,6 +137,9 @@ function createMock() {
         requestMicrophone().then((result) => {
           micGranted = result === 'granted';
           if (!micGranted) settle('no_response');
+        }).catch(() => {
+          micGranted = false;
+          settle('no_response');
         });
       }
     });

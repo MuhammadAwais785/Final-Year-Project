@@ -5,21 +5,28 @@
  * a clarity score from 0 to 100. Works for both English and Urdu (BR-3).
  *
  * Scoring rules (simple, no external API needed — runs fully on device):
- *  - Exact match              → 100
- *  - Starts-with match        → 85
- *  - Contains expected        → 70
- *  - Levenshtein distance ≤ 2 → 60 (close enough, e.g. "aple" vs "apple")
- *  - Levenshtein distance ≤ 4 → 40 (partial attempt)
- *  - No match                 → 0
+ *  - Exact match                                   → 100
+ *  - Targets of 4 letters or fewer: only the word plus one ending letter
+ *    ("cat" → "cats")                              → 85; anything else → 0
+ *  - Targets of 5+ letters: one letter more or less at the end ("appl", "apples") → 85,
+ *    otherwise edit distance ≤ 1 ("aple" vs "apple") → 60
+ *  - No match                                      → 0
  */
+
+// Targets shorter than this need an exact match; longer ones allow one slip.
+const MIN_LENGTH_FOR_TYPO = 5;
 
 /** Levenshtein edit distance between two strings (small words only). */
 function editDistance(a, b) {
   const m = a.length;
   const n = b.length;
-  const dp = Array.from({ length: m + 1 }, (_, i) =>
-    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
-  );
+  const dp = [];
+  for (let i = 0; i <= m; i++) {
+    dp.push([]);
+    for (let j = 0; j <= n; j++) {
+      dp[i].push(i === 0 ? j : j === 0 ? i : 0);
+    }
+  }
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
       dp[i][j] =
@@ -40,6 +47,9 @@ function normalise(word) {
   return word
     .toLowerCase()
     .replace(/[\u064B-\u065F]/g, '') // Arabic/Urdu diacritics
+    .replace(/[\u064A\u0649]/g, '\u06CC') // ي ى → ی
+    .replace(/\u0643/g, '\u06A9') // ك → ک
+    .replace(/\u0647/g, '\u06C1') // ه → ہ
     .replace(/[^a-z0-9\u0600-\u06FF\s]/g, '')
     .trim();
 }
@@ -49,7 +59,7 @@ function normalise(word) {
  *
  * @param {string} transcript   - What the speech engine heard
  * @param {string} expectedWord - The word the child should say
- * @returns {{ score: number, label: 'perfect'|'good'|'try_again'|'no_match' }}
+ * @returns {{ score: number, label: 'perfect'|'good'|'no_match' }}
  */
 export function scoreClarity(transcript, expectedWord) {
   const heard = normalise(transcript);
@@ -68,30 +78,19 @@ export function scoreClarity(transcript, expectedWord) {
   const words = heard.split(/\s+/);
   for (const w of words) {
     let score = 0;
-    if (w === target)                                   score = 100;
-    else if (w.startsWith(target) || target.startsWith(w)) score = 85;
-    else if (w.includes(target)   || target.includes(w))   score = 70;
-    else {
-      const dist = editDistance(w, target);
-      if (dist <= 2) score = 60;
-      else if (dist <= 4) score = 40;
-    }
+    const gap = Math.abs(w.length - target.length);
+    if (w === target) score = 100;
+    else if (target.length < MIN_LENGTH_FOR_TYPO) {
+      // Short words: exact, or the word plus one ending letter (cat → cats)
+      if (w.length === target.length + 1 && w.startsWith(target)) score = 85;
+    } else if (gap <= 1 && (w.startsWith(target) || target.startsWith(w))) score = 85;
+    else if (editDistance(w, target) <= 1) score = 60;
     if (score > bestScore) {
       bestScore = score;
-      if      (score === 100) bestLabel = 'perfect';
-      else if (score >= 60)   bestLabel = 'good';
-      else if (score >= 40)   bestLabel = 'try_again';
+      bestLabel = score === 100 ? 'perfect' : 'good';
     }
     if (bestScore === 100) break; // perfect — no need to check further
   }
 
   return { score: bestScore, label: bestLabel };
 }
-
-/** Human-readable feedback text for a score label (bilingual). */
-export const CLARITY_FEEDBACK = {
-  perfect: { en: 'Perfect! ⭐', ur: 'شاباش! ⭐' },
-  good: { en: 'Good try! Almost!', ur: 'بہت اچھا! قریب ہے!' },
-  try_again: { en: 'Try again!', ur: 'دوبارہ کوشش کریں!' },
-  no_match: { en: "I didn't hear that. Try again!", ur: 'سمجھ نہیں آیا۔ دوبارہ کوشش کریں!' },
-};

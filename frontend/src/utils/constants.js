@@ -13,12 +13,13 @@ export const LEVELS = [1, 2, 3];
 export const GAME = { ROUND_SIZE: 6, HINT_AFTER_FAILS: 2, MAX_HINT_LEVEL: 3, MAX_ATTEMPTS: 5, STARS_CORRECT: 2, STARS_WITH_HINT: 1, LISTEN_MS: 6000, EASY_ROUND_SIZE: 3, DAILY_MILESTONE_STARS: 10 };
 // Speech recogniser thresholds (M04, TBD-03). Values are starting points; supervisor to confirm.
 // CONFIDENCE_MIN: below this → inconclusive (BR-22). SCORE_PASS: below this → incorrect (BR-23).
-export const SPEECH = { LISTEN_MS: 6000, CONFIDENCE_MIN: 0.6, SCORE_PASS: 60 };
+export const SPEECH = { CONFIDENCE_MIN: 0.6, SCORE_PASS: 60 };
 // Difficulty / level locking (M06, BR-14). PROMOTE_AFTER_CORRECT: correct-in-a-row before promoting.
 export const DIFFICULTY = { PROMOTE_AFTER_CORRECT: 3 };
 // Break trigger (M07, BR-27, TBD-04). WINDOW_MS: sustained-stress window. STRESS_THRESHOLD: 0–1.
 // MIN_SAMPLES: minimum indicator snapshots in the window before we can trigger.
-export const BREAK = { WINDOW_MS: 10000, STRESS_THRESHOLD: 0.65, MIN_SAMPLES: 3 };
+// MIN_SPAN_RATIO: the samples must cover this share of the window (sustained, not a spike).
+export const BREAK = { WINDOW_MS: 10000, STRESS_THRESHOLD: 0.65, MIN_SAMPLES: 3, MIN_SPAN_RATIO: 0.8 };
 // Goals (FR-3): at most MAX goals per child (BR-7). BR-8 is not described in DESIGN.md or next-tasks.md, so no rule is built on it yet.
 // The word and minute ranges are our own guesses: to confirm with supervisor.
 export const GOALS = { MAX: 5, WORDS_MIN: 1, WORDS_MAX: 50, MINUTES_MIN: 5, MINUTES_MAX: 30 };
@@ -26,5 +27,5 @@ export const GOALS = { MAX: 5, WORDS_MIN: 1, WORDS_MAX: 50, MINUTES_MIN: 5, MINU
 // PHONEME_PASS: easiest level (child repeats a single sound, e.g. "aaa").
 // SYLLABLE_PASS: mid level (e.g. "ap" from "apple").
 // WORD_PASS: hardest level — same as SPEECH.SCORE_PASS (full word match).
-// Fasih: BR-16 mein phoneme level 40 rakha hai (naram), word level 60 (strict). Supervisor se confirm karna hai.
+// BR-16: the phoneme level is soft (40) and the word level is strict (60). To confirm with supervisor.
 export const IMITATION = { PHONEME_PASS: 40, SYLLABLE_PASS: 50, WORD_PASS: 60 };

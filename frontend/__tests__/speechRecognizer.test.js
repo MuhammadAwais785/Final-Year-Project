@@ -18,9 +18,10 @@ jest.mock('../src/utils/permissions', () => ({
   requestMicrophone: jest.fn().mockResolvedValue('granted'),
 }));
 
-// Mock constants — provide SPEECH values without React Native
+// Mock constants — provide GAME and SPEECH values without React Native
 jest.mock('../src/utils/constants', () => ({
-  SPEECH: { LISTEN_MS: 6000, CONFIDENCE_MIN: 0.6, SCORE_PASS: 60 },
+  GAME: { LISTEN_MS: 6000 },
+  SPEECH: { CONFIDENCE_MIN: 0.6, SCORE_PASS: 60 },
 }));
 
 // We re-import inside each test so the mock resets cleanly
@@ -31,8 +32,9 @@ beforeEach(() => {
 });
 
 describe('speechRecognizer — status rules', () => {
-  test('TD-07: returns no_response when nothing is simulated (timeout)', async () => {
+  test('TD-07: returns no_response when the child stays silent', async () => {
     const { speechRecognizer } = mod;
+    speechRecognizer.simulate('silence');
     const result = await speechRecognizer.recognize({
       acceptedAnswers: ['cat'],
       language: 'en',
@@ -41,6 +43,17 @@ describe('speechRecognizer — status rules', () => {
     expect(result.status).toBe('no_response');
     expect(result.heard).toBeNull();
     expect(result.score).toBe(0);
+  });
+
+  test('default (no simulate) returns recognized so the games can be played', async () => {
+    const { speechRecognizer } = mod;
+    const result = await speechRecognizer.recognize({
+      acceptedAnswers: ['cat'],
+      language: 'en',
+      listenMs: 100,
+    });
+    expect(result.status).toBe('recognized');
+    expect(result.heard).toBe('cat');
   });
 
   test('TD-08: returns inconclusive when simulated unclear', async () => {
@@ -93,13 +106,32 @@ describe('speechRecognizer — status rules', () => {
     expect(result.status).toBe('no_response');
   });
 
-  test('simulate is single-use — next call without simulate returns no_response', async () => {
+  test('simulate is single-use — next call without simulate returns recognized', async () => {
     const { speechRecognizer } = mod;
-    speechRecognizer.simulate('correct');
+    speechRecognizer.simulate('wrong');
     // consume the simulated outcome
     await speechRecognizer.recognize({ acceptedAnswers: ['a'], listenMs: 100 });
     // next call with no simulate
     const result = await speechRecognizer.recognize({ acceptedAnswers: ['a'], listenMs: 100 });
-    expect(result.status).toBe('no_response');
+    expect(result.status).toBe('recognized');
+  });
+  test('a new recognize() resolves the earlier pending one as no_response', async () => {
+    const { speechRecognizer } = mod;
+    const first = speechRecognizer.recognize({ acceptedAnswers: ['cat'], listenMs: 5000 });
+    const second = speechRecognizer.recognize({ acceptedAnswers: ['dog'], listenMs: 100 });
+    expect((await first).status).toBe('no_response');
+    expect((await second).status).toBe('recognized');
+  });
+
+  test('mic denied → no_response now and on the next call, without a wait', async () => {
+    const { requestMicrophone } = require('../src/utils/permissions');
+    requestMicrophone.mockResolvedValueOnce('denied');
+    const { speechRecognizer } = mod;
+    speechRecognizer.simulate('correct');
+    const first = await speechRecognizer.recognize({ acceptedAnswers: ['cat'], listenMs: 5000 });
+    expect(first.status).toBe('no_response');
+    expect(first.heard).toBeNull();
+    const second = await speechRecognizer.recognize({ acceptedAnswers: ['cat'], listenMs: 5000 });
+    expect(second.status).toBe('no_response');
   });
 });
