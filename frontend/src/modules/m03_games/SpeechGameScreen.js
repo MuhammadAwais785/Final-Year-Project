@@ -16,14 +16,20 @@ import PromptCard from './PromptCard';
 import { applyResult, createRound, currentPromptId, pickPrompts, summarize } from './round';
 import RoundProgress from './RoundProgress';
 import * as defaultRewards from './rewardStore';
+import * as defaultSessions from './sessionStore';
 import RoundSummary from './RoundSummary';
 import { recognizer as defaultRecognizer } from './speech';
+
+// Saves a round as a session. Failures are swallowed: a storage problem must not break the game (UC-5 POST-1).
+const persist = (sessions, childId, activity, startedAt, endedAt, state, partial) => {
+  sessions.saveSession(childId, { activity, startedAt, endedAt, partial, round: state }).catch(() => {});
+};
 
 const newRound = (ids, size) => createRound(pickPrompts(ids, size));
 
 /**
  * Shared screen for the speech games: object naming (UC-11) and colour matching (UC-12) (UI-3, UI-4, UI-7).
- * `content` is { itemById(id), itemIds(level), text: { en, ur } }; PromptCard shows an icon or a swatch.
+ * `content` is { itemById(id), itemIds(level), text: { en, ur }, activity }; PromptCard shows an icon or a swatch.
  * Owns the round state and the listen loop: listen -> applyResult -> feedback.
  * phase: 'listening' | 'retry' (message shown, tap the mic) | 'correct' | 'moving_on' | 'done'.
  * recognizer, itemIds and roundSize are props so tests can script the answers.
@@ -36,6 +42,7 @@ export default function SpeechGameScreen({
   startStars = 0,
   now = Date.now,
   rewards = defaultRewards,
+  sessions = defaultSessions,
   onDone,
   onExit,
 }) {
@@ -52,6 +59,7 @@ export default function SpeechGameScreen({
   const roundRef = useRef(round);
   const mountedRef = useRef(true); // no setState after unmount
   const savedRoundRef = useRef(null); // the round whose stars are already saved
+  const startedAtRef = useRef(now()); // when the current round began (UC-5 POST-1)
   const phaseRef = useRef(phase); // guards against a double tap before React re-renders
   const item = shownId ? content.itemById(shownId) : null;
 
@@ -77,20 +85,27 @@ export default function SpeechGameScreen({
 
   useEffect(() => () => { mountedRef.current = false; }, []);
 
-  // Save the round's stars once when it ends (FR-6, FR-8). Keyed by the round object, so
-  // re-renders and a double tap on Done / Play again cannot add them twice.
+  // Save a round once: the session (UC-5 POST-1) and, if it was finished, its stars (FR-6, FR-8).
+  // Keyed by the round object, so re-renders, double taps and exit after Done cannot save twice.
   const childId = child?._id;
-  useEffect(() => {
-    if (phase !== 'done' || !childId || savedRoundRef.current === round) return;
-    savedRoundRef.current = round;
-    const earned = summarize(round).stars;
+  const saveRound = (state) => {
+    if (!childId || savedRoundRef.current === state || state.attemptLog.length === 0) return;
+    savedRoundRef.current = state;
+    persist(sessions, childId, content.activity, startedAtRef.current, now(), state, !state.finished);
+    const earned = state.finished ? summarize(state).stars : 0;
     if (earned <= 0) return;
-    const saved = round;
     rewards.addStars(childId, earned, now()).then((result) => {
       // only for this round: a late result must not show the badge on the next one
-      if (mountedRef.current && roundRef.current === saved && result?.milestoneJustReached) setMilestone(true);
+      if (mountedRef.current && roundRef.current === state && result?.milestoneJustReached) setMilestone(true);
     }).catch(() => {}); // a storage failure must not break the summary
-  }, [phase, round, childId, rewards, now]);
+  };
+
+  useEffect(() => { if (phase === 'done') saveRound(round); });
+
+  // Leaving without the exit button still keeps the round.
+  const saveRoundRef = useRef(saveRound);
+  saveRoundRef.current = saveRound;
+  useEffect(() => () => saveRoundRef.current(roundRef.current), []);
 
   // A late answer must never reach a screen that is gone (BR-20: nothing is kept either).
   useEffect(() => () => cancelListening(recognizer), [recognizer]);
@@ -113,6 +128,7 @@ export default function SpeechGameScreen({
   const playAgain = () => {
     const fresh = newRound(ids, roundSize);
     roundRef.current = fresh;
+    startedAtRef.current = now();
     setRound(fresh);
     setShownId(currentPromptId(fresh));
     setView({ feedback: null, earned: 0 });
@@ -122,6 +138,7 @@ export default function SpeechGameScreen({
 
   const exit = () => {
     cancelListening(recognizer);
+    saveRound(roundRef.current);
     onExit?.();
   };
 
