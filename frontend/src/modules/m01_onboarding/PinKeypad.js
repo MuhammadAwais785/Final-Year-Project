@@ -1,11 +1,18 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useScreenLanguage } from '../../context/LanguageContext';
 import { colors, radius, shadows, spacing, textStyle, touch } from '../../theme';
+import { PIN_TEXT } from './pinText';
 
 const ROWS = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], [null, '0', 'delete']];
 
-/** Numbers-only PIN keypad with 72dp round keys (design: parent_gate_pin_verification). */
-export default function PinKeypad({ onDigit, onDelete, disabled = false }) {
+/**
+ * Numbers-only PIN keypad with 72dp round keys (design: parent_gate_pin_verification).
+ * Keys stay in the same place and use Western digits in Urdu too; only the Delete label changes.
+ */
+export default function PinKeypad({ onDigit, onDelete, disabled = false, language }) {
+  const lang = useScreenLanguage(language);
+  const deleteLabel = PIN_TEXT[lang].delete;
   return <View style={styles.pad}>
     {ROWS.map((row, r) => <View key={r} style={styles.row}>
       {row.map((key, k) => {
@@ -17,11 +24,11 @@ export default function PinKeypad({ onDigit, onDelete, disabled = false }) {
           disabled={disabled}
           onPress={() => (isDelete ? onDelete() : onDigit(key))}
           accessibilityRole="button"
-          accessibilityLabel={isDelete ? 'Delete' : key}
+          accessibilityLabel={isDelete ? deleteLabel : key}
           accessibilityState={{ disabled }}
           style={({ pressed }) => [styles.key, isDelete ? styles.deleteKey : styles.digitKey, pressed && styles.pressed, disabled && styles.disabled]}>
           {isDelete
-            ? <><Text style={styles.deleteIcon}>⌫</Text><Text style={[textStyle('labelSm'), styles.deleteText]}>Delete</Text></>
+            ? <><Text style={styles.deleteIcon}>⌫</Text><Text style={[textStyle('labelSm', lang), styles.deleteText]}>{deleteLabel}</Text></>
             : <Text style={[textStyle('headlineLg'), styles.digit]}>{key}</Text>}
         </Pressable>;
       })}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChildProfileProvider, useChildProfile } from '../context/ChildProfileContext';
+import { LanguageProvider } from '../context/LanguageContext';
 import BaselineScreen from '../modules/m01_onboarding/BaselineScreen';
 import ChildProfileScreen from '../modules/m01_onboarding/ChildProfileScreen';
 import ConsentScreen from '../modules/m01_onboarding/ConsentScreen';
@@ -30,6 +31,11 @@ export const SCREENS = [
   { id: 'add-child', title: 'Add a child', render: (back) => <ChildProfileScreen onBack={back} onSaved={back} /> },
   { id: 'consent', title: 'Consent and permissions', child: ALI, render: (back) => <ConsentScreen onBack={back} onSaved={back} /> },
   { id: 'baseline', title: 'Baseline check', child: ALI, render: (back) => <BaselineScreen onBack={back} onExit={back} onComplete={back} /> },
+  { id: 'home-ur', title: 'Home (Urdu)', render: (back) => <HomeScreen language="ur" onChildMode={back} onParentPortal={back} /> },
+  { id: 'pin-ur', title: 'Parent PIN (Urdu)', render: (back) => <PinScreen language="ur" store={pinStore} onUnlocked={back} onBack={back} onForgotPin={back} /> },
+  { id: 'add-child-ur', title: 'Add a child (Urdu)', render: (back) => <ChildProfileScreen language="ur" onBack={back} onSaved={back} /> },
+  { id: 'consent-ur', title: 'Consent and permissions (Urdu)', child: ALI, render: (back) => <ConsentScreen language="ur" onBack={back} onSaved={back} /> },
+  { id: 'baseline-ur', title: 'Baseline check (Urdu)', child: ALI_UR, render: (back) => <BaselineScreen language="ur" onBack={back} onExit={back} onComplete={back} /> },
   { id: 'goals-en', title: 'Goals (English)', child: ALI, render: (back) => <GoalsScreen onBack={back} onSaved={back} /> },
   { id: 'goals-ur', title: 'Goals (Urdu)', child: ALI_UR, render: (back) => <GoalsScreen language="ur" onBack={back} onSaved={back} /> },
   { id: 'child-home-en', title: 'Child Mode home (English)', child: ALI, render: (back) => <ChildHomeScreen stars={12} onSelectGame={back} onExit={back} /> },
@@ -64,7 +70,8 @@ export default function ScreenGallery() {
   const open = SCREENS.find((s) => s.id === openId);
   const back = () => setOpenId(null);
 
-  return <ChildProfileProvider>
+  // The language setting is shared, so the Home toggle works here too.
+  return <LanguageProvider><ChildProfileProvider>
     {open
       ? <><SampleChild child={open.child} />{open.render(back)}</>
       : <SafeAreaView style={styles.screen}>
@@ -75,7 +82,7 @@ export default function ScreenGallery() {
           </Pressable>)}
         </ScrollView>
       </SafeAreaView>}
-  </ChildProfileProvider>;
+  </ChildProfileProvider></LanguageProvider>;
 }
 
 const styles = StyleSheet.create({
