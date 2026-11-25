@@ -79,12 +79,12 @@ describe('PinScreen verify (UC-23, BR-34)', () => {
     expect(store.data.lock).toEqual({ failedAttempts: 0, lockedUntil: null });
   });
 
-  test('a wrong PIN shows the attempts left in English and Urdu and clears the dots', async () => {
+  test('a wrong PIN shows the attempts left in English only and clears the dots', async () => {
     const store = fakeStore({ pin: '2468' });
     const { type, texts, root } = await render(store);
     await type('1111');
     expect(texts()).toContain('⚠ Incorrect PIN. 4 attempts left.');
-    expect(texts()).toContain('غلط پن۔ 4 کوششیں باقی ہیں۔');
+    expect(texts().some((t) => /[؀-ۿ]/.test(t))).toBe(false);
     expect(root.findByProps({ accessibilityLabel: `0 of ${PIN.LENGTH} digits entered` })).toBeDefined();
   });
 

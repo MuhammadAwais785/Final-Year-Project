@@ -1,23 +1,21 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LanguageToggle from '../../components/LanguageToggle';
+import { useLanguage, useScreenLanguage } from '../../context/LanguageContext';
 import { colors, radius, shadows, spacing, textStyle, touch } from '../../theme';
+import { HOME_TEXT } from './homeText';
 
-const LANGS = [{ value: 'en', label: 'EN' }, { value: 'ur', label: 'اردو' }];
-
-/** English line above its Urdu line, as everywhere on this screen. */
-function Bilingual({ en, ur, variant, enColor, urColor = enColor, centred }) {
-  const align = centred ? styles.centred : null;
-  return <View>
-    <Text style={[textStyle(variant), { color: enColor }, align]}>{en}</Text>
-    <Text style={[textStyle(variant, 'ur'), { color: urColor }, align]}>{ur}</Text>
-  </View>;
+/** One line in the screen language only (UI-8); Urdu is right to left in its own Text. */
+function Line({ text, variant, color, lang, centred }) {
+  return <Text style={[textStyle(variant, lang), { color }, centred && styles.centred]}>{text}</Text>;
 }
 
-function ModeCard({ testID, title, icon, iconStyle, cardStyle, titleColor, urColor, button, buttonColor, onPress, disabled }) {
+function ModeCard({ testID, title, icon, iconStyle, cardStyle, titleColor, button, buttonColor, onPress, disabled, lang }) {
+  const flip = lang === 'ur' && styles.flip;
   return <View style={[styles.card, cardStyle]}>
-    <View style={styles.cardTop}>
-      <Bilingual en={title.en} ur={title.ur} variant="headlineSm" enColor={titleColor} urColor={urColor} />
+    <View style={[styles.cardTop, flip]}>
+      <View style={styles.titleBox}><Line text={title} variant="headlineSm" color={titleColor} lang={lang} /></View>
       <View style={[styles.cardIcon, iconStyle]}><Text style={styles.cardIconText}>{icon}</Text></View>
     </View>
     <Pressable
@@ -25,11 +23,11 @@ function ModeCard({ testID, title, icon, iconStyle, cardStyle, titleColor, urCol
       onPress={onPress}
       disabled={disabled}
       accessibilityRole="button"
-      accessibilityLabel={`${title.en}: ${button.en}`}
+      accessibilityLabel={`${title}: ${button.label}`}
       accessibilityState={{ disabled }}
-      style={({ pressed }) => [styles.cardButton, { backgroundColor: buttonColor }, pressed && styles.pressed, disabled && styles.disabled]}>
-      <Text style={[textStyle('labelLg'), styles.onButton]}>{button.icon}  {button.en}</Text>
-      <Text style={[textStyle('bodyLg', 'ur'), styles.onButton]}>{button.ur}</Text>
+      style={({ pressed }) => [styles.cardButton, flip, { backgroundColor: buttonColor }, pressed && styles.pressed, disabled && styles.disabled]}>
+      <Text style={[textStyle(lang === 'ur' ? 'bodyLg' : 'labelLg', lang), styles.onButton]}>{lang === 'ur' ? button.label : `${button.icon}  ${button.label}`}</Text>
+      {lang === 'ur' && <Text style={[textStyle('labelLg'), styles.onButton]}>{button.icon}</Text>}
     </Pressable>
   </View>;
 }
@@ -37,65 +35,50 @@ function ModeCard({ testID, title, icon, iconStyle, cardStyle, titleColor, urCol
 /**
  * Home (UI-1, design: app_home_mode_selection): two clearly separated entry points,
  * Child Mode and the PIN-protected Parent Portal. Child Mode needs a child profile first.
+ * `language` (else the shared parent language) picks English or Urdu, one language at a time (UI-8).
  */
-export default function HomeScreen({ onChildMode, onParentPortal, childModeAvailable = true, language = 'en', onLanguageChange }) {
+export default function HomeScreen({ onChildMode, onParentPortal, childModeAvailable = true, language, onLanguageChange }) {
+  const lang = useScreenLanguage(language);
+  const { setLanguage } = useLanguage();
+  const t = HOME_TEXT[lang];
   return <SafeAreaView style={styles.screen}>
     <ScrollView contentContainerStyle={styles.content}>
-      <View style={styles.toggle} accessibilityRole="radiogroup" accessibilityLabel="Language">
-        {LANGS.map((l) => {
-          const selected = l.value === language;
-          return <Pressable
-            key={l.value}
-            testID={`lang-${l.value}`}
-            onPress={() => onLanguageChange?.(l.value)}
-            accessibilityRole="radio"
-            accessibilityState={{ selected }}
-            style={[styles.toggleOption, selected && styles.toggleSelected]}>
-            <Text style={[textStyle('labelSm', l.value), selected ? styles.onButton : styles.toggleText]}>{l.label}</Text>
-          </Pressable>;
-        })}
-      </View>
+      <LanguageToggle style={styles.toggle} language={lang} onChange={onLanguageChange || setLanguage} />
 
       <View style={styles.brand}>
         <View style={styles.brandIcon}><Text style={styles.brandIconText}>{'\u{1F5E3}︎'}</Text></View>
-        <Bilingual en="Silent Screen" ur="سائلنٹ اسکرین سنڈروم" variant="headlineMd" enColor={colors.text} urColor={colors.primary} centred />
+        <Line text={t.appName} variant="headlineMd" color={colors.text} lang={lang} centred />
         <View style={styles.tagline}>
-          <Bilingual en="Talk, play and learn" ur="بولیں، کھیلیں اور سیکھیں" variant="label" enColor={colors.textMuted} urColor={colors.success} centred />
+          <Line text={t.tagline} variant="label" color={colors.textMuted} lang={lang} centred />
         </View>
       </View>
 
       <ModeCard
         testID="child-mode"
-        title={{ en: 'Child Mode', ur: 'بچوں کا موڈ' }}
+        title={t.childMode}
         icon={'\u{1F388}'}
         cardStyle={styles.childCard}
         iconStyle={styles.childIcon}
         titleColor={colors.onChildCard}
-        urColor={colors.clayDark}
-        button={{ en: 'Start', ur: 'شروع کریں', icon: '▶' }}
+        button={{ label: t.start, icon: '▶' }}
         buttonColor={colors.clayDark}
         onPress={onChildMode}
         disabled={!childModeAvailable}
+        lang={lang}
       />
-      {!childModeAvailable && <Bilingual
-        en="Add a child in the Parent Portal first."
-        ur="پہلے والدین کے پورٹل میں بچہ شامل کریں۔"
-        variant="label"
-        enColor={colors.textMuted}
-        centred
-      />}
+      {!childModeAvailable && <Line text={t.needChild} variant="label" color={colors.textMuted} lang={lang} centred />}
 
       <ModeCard
         testID="parent-portal"
-        title={{ en: 'Parent Portal', ur: 'والدین کا پورٹل' }}
+        title={t.parentPortal}
         icon={'\u{1F512}'}
         cardStyle={styles.parentCard}
         iconStyle={styles.parentIcon}
         titleColor={colors.text}
-        urColor={colors.primary}
-        button={{ en: 'Open', ur: 'کھولیں', icon: '\u{1F511}' }}
+        button={{ label: t.open, icon: '\u{1F511}' }}
         buttonColor={colors.primaryLight}
         onPress={onParentPortal}
+        lang={lang}
       />
     </ScrollView>
   </SafeAreaView>;
@@ -104,11 +87,10 @@ export default function HomeScreen({ onChildMode, onParentPortal, childModeAvail
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.parentBackground },
   content: { padding: spacing.screen, gap: spacing.lg },
+  titleBox: { flexShrink: 1 },
   centred: { textAlign: 'center' },
-  toggle: { alignSelf: 'flex-end', flexDirection: 'row', padding: spacing.xs, borderRadius: radius.pill, backgroundColor: colors.toggle },
-  toggleOption: { minWidth: touch.parent, minHeight: 32, paddingHorizontal: spacing.sm, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
-  toggleSelected: { backgroundColor: colors.primary },
-  toggleText: { color: colors.textMuted },
+  toggle: { alignSelf: 'flex-end' },
+  flip: { flexDirection: 'row-reverse' },
   brand: { alignItems: 'center', gap: spacing.sm },
   brandIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
   brandIconText: { fontSize: 22, color: colors.primary },

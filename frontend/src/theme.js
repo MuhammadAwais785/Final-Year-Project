@@ -102,12 +102,18 @@ const URDU_FALLBACK = {
   display: 'headlineLg', headlineSm: 'headlineMd', childTitle: 'headlineMd', labelLg: 'bodyLg', label: 'body', labelSm: 'body',
 };
 
+export const URDU_GLYPH_PAD = 8;
+
 export function textStyle(variant, language = 'en') {
   const urdu = language === 'ur';
   const table = urdu ? typography.ur : typography.en;
   const { fontWeight, ...style } = table[variant] || (urdu && table[URDU_FALLBACK[variant]]) || table.body;
   const fontFamily = fonts[urdu ? 'ur' : 'en'][fontWeight];
-  return urdu ? { ...style, fontFamily, writingDirection: 'rtl', textAlign: 'right' } : { ...style, fontFamily };
+  // Android measures Nastaliq narrower than it draws and clips the last (left-most) word of shrink-wrapped
+  // Text; the horizontal padding gives the shaped glyphs room (URDU_GLYPH_PAD).
+  return urdu
+    ? { ...style, fontFamily, writingDirection: 'rtl', textAlign: 'right', paddingHorizontal: URDU_GLYPH_PAD }
+    : { ...style, fontFamily };
 }
 
 // Soft shadows tinted with the text colour (elevation for Android, shadow* for iOS).

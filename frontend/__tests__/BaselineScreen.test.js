@@ -48,17 +48,17 @@ async function render(props = {}, language) {
 beforeEach(() => AsyncStorage.clear());
 
 describe('BaselineScreen (FR-2)', () => {
-  test('starts at task 1, attempt 1, 0%, showing the answer in both languages', async () => {
+  test('starts at task 1, attempt 1, 0%, showing the answer in English only', async () => {
     const { texts } = await render();
     expect(texts()).toEqual(expect.arrayContaining(['Task 1 of 2', 'Attempt 1 of 3', '0%', 'Ask child to name the object']));
-    expect(texts().some((t) => t.startsWith('Answer: apple'))).toBe(true);
-    expect(texts()).toContain('سیب');
+    expect(texts()).toEqual(expect.arrayContaining(['Answer:', 'apple']));
+    expect(texts()).not.toContain('سیب');
   });
 
-  test('shows the child-language word first for an Urdu child', async () => {
+  test('shows only the child-language word for an Urdu child', async () => {
     const { texts } = await render({}, 'ur');
-    expect(texts()).toContain('Answer: سیب');
-    expect(texts()).toContain('apple');
+    expect(texts()).toEqual(expect.arrayContaining(['Answer:', 'سیب']));
+    expect(texts()).not.toContain('apple');
   });
 
   test('saves after every tap, so the check can resume', async () => {

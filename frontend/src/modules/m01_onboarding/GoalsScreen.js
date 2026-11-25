@@ -5,6 +5,7 @@ import ActionButton from '../../components/ActionButton';
 import { FieldError } from '../../components/FieldText';
 import ScreenHeader from '../../components/ScreenHeader';
 import { useChildProfile } from '../../context/ChildProfileContext';
+import { useScreenLanguage } from '../../context/LanguageContext';
 import { colors, spacing, textStyle } from '../../theme';
 import { GOALS } from '../../utils/constants';
 import { loadLastCompleted } from './baselineStore';
@@ -16,9 +17,10 @@ import { getGoals, saveGoals } from './goalsStore';
 /**
  * Goals (UI-05, FR-3, BR-7; design: goals). Shows the saved goals, or goals suggested from the baseline,
  * and lets the parent edit, add (up to the limit) and remove them. Parent screen: neutral style.
- * `language` is 'en' or 'ur' (shared language setting comes with the Urdu parent screens task).
+ * `language` ('en' or 'ur') wins when given, otherwise the shared parent language (UI-8).
  */
-export default function GoalsScreen({ childId, language = 'en', onSaved, onBack }) {
+export default function GoalsScreen({ childId, language: languageProp, onSaved, onBack }) {
+  const language = useScreenLanguage(languageProp);
   const { child } = useChildProfile();
   const id = childId ?? child?._id;
   const t = GOALS_TEXT[language];

@@ -15,10 +15,11 @@ function render(props = {}) {
 }
 
 describe('HomeScreen (UI-1)', () => {
-  test('shows both entry points in English and Urdu', () => {
+  test('shows both entry points in English only', () => {
     const { texts } = render();
-    ['Child Mode', 'بچوں کا موڈ', 'Parent Portal', 'والدین کا پورٹل', 'Silent Screen', 'سائلنٹ اسکرین سنڈروم']
+    ['Child Mode', 'Parent Portal', 'Silent Screen']
       .forEach((t) => expect(texts()).toContain(t));
+    ['بچوں کا موڈ', 'والدین کا پورٹل', 'سائلنٹ اسکرین سنڈروم'].forEach((t) => expect(texts()).not.toContain(t));
   });
 
   test('Start opens Child Mode and Open opens the Parent Portal', () => {

@@ -7,13 +7,14 @@ import SpeechBubble from '../../components/SpeechBubble';
 import StarCounter from '../../components/StarCounter';
 import { useChildProfile } from '../../context/ChildProfileContext';
 import { colors, fonts, radius, spacing, textStyle } from '../../theme';
+import { ACTIVITIES } from '../../utils/constants';
 import DoctorAvatar from '../m02_avatar/DoctorAvatar';
 
 // The three speech games (UC-11, UC-12, UC-13).
 export const GAMES = [
-  { id: 'objectNaming', icon: '\u{1F34E}', tone: 'sky', title: { en: 'What is this?', ur: 'یہ کیا ہے؟' } },
-  { id: 'colourMatching', icon: '\u{1F3A8}', tone: 'peach', title: { en: 'Colours', ur: 'رنگ' } },
-  { id: 'soundImitation', icon: '\u{1F442}', tone: 'mint', title: { en: 'Copy the sound', ur: 'آواز دہرائیں' } },
+  { id: ACTIVITIES.OBJECT_NAMING, icon: '\u{1F34E}', tone: 'sky', title: { en: 'What is this?', ur: 'یہ کیا ہے؟' } },
+  { id: ACTIVITIES.COLOUR_MATCHING, icon: '\u{1F3A8}', tone: 'peach', title: { en: 'Colours', ur: 'رنگ' } },
+  { id: ACTIVITIES.SOUND_IMITATION, icon: '\u{1F442}', tone: 'mint', title: { en: 'Copy the sound', ur: 'آواز دہرائیں' } },
 ];
 
 const TEXT = {

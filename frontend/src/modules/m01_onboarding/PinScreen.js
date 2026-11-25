@@ -3,28 +3,19 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing, textStyle } from '../../theme';
 import { PIN } from '../../utils/constants';
+import { useScreenLanguage } from '../../context/LanguageContext';
 import PinKeypad from './PinKeypad';
+import { PIN_TEXT } from './pinText';
 import { initialLockState, isLocked, lockRemainingMs, registerFailure, registerSuccess, remainingAttempts } from './pinLock';
-
-// Every message is shown in English and Urdu, as in the design.
-const TEXT = {
-  create: { en: 'Create a parent PIN', ur: 'والدین کا پن بنائیں' },
-  confirm: { en: 'Enter the PIN again', ur: 'پن دوبارہ درج کریں' },
-  verify: { en: 'Enter Parent PIN', ur: 'والدین کا پن کوڈ درج کریں' },
-  subtitle: 'To keep child play safe, enter your 4-digit security code.',
-  mismatch: { en: 'The PINs did not match. Please choose a PIN again.', ur: 'پن ایک جیسے نہیں تھے۔ دوبارہ پن بنائیں۔' },
-  wrong: (n) => ({ en: `Incorrect PIN. ${n} attempts left.`, ur: `غلط پن۔ ${n} کوششیں باقی ہیں۔` }),
-  locked: (m) => ({ en: `Too many tries. Try again in ${m} min.`, ur: `بہت زیادہ کوششیں۔ ${m} منٹ بعد دوبارہ کوشش کریں۔` }),
-  back: { en: 'Back', ur: 'واپس' },
-  forgot: { en: 'Forgot PIN? Reset with email & password', ur: 'پن بھول گئے؟ ای میل اور پاس ورڈ سے ری سیٹ کریں' },
-};
 
 /**
  * Parent gate (UC-22, UC-23, BR-34). The first visit creates a PIN (enter + confirm);
  * later visits verify it. 5 wrong PINs in a row lock entry for a while, even after an app restart.
  * store: { hasPin, savePin, checkPin, loadLockState, saveLockState } (all async).
  */
-export default function PinScreen({ store, onUnlocked, onBack, onForgotPin, now = Date.now }) {
+export default function PinScreen({ store, onUnlocked, onBack, onForgotPin, now = Date.now, language }) {
+  const lang = useScreenLanguage(language);
+  const urdu = lang === 'ur';
   const [mode, setMode] = useState(null); // 'create' | 'confirm' | 'verify', null while loading
   const [entry, setEntry] = useState('');
   const [message, setMessage] = useState(null);
@@ -60,7 +51,7 @@ export default function PinScreen({ store, onUnlocked, onBack, onForgotPin, now 
         setMode('confirm');
       } else if (mode === 'confirm') {
         if (pin !== firstPin.current) {
-          setMessage(TEXT.mismatch);
+          setMessage({ key: 'mismatch' });
           setMode('create');
           return;
         }
@@ -78,7 +69,7 @@ export default function PinScreen({ store, onUnlocked, onBack, onForgotPin, now 
         await store.saveLockState(next);
         setLock(next);
         setClock(at);
-        setMessage(isLocked(next, at) ? null : TEXT.wrong(remainingAttempts(next)));
+        setMessage(isLocked(next, at) ? null : { key: 'wrong', n: remainingAttempts(next) });
       }
     } finally {
       setEntry('');
@@ -95,40 +86,40 @@ export default function PinScreen({ store, onUnlocked, onBack, onForgotPin, now 
 
   if (!mode) return <SafeAreaView style={styles.screen} />;
 
-  const title = TEXT[mode];
-  const shown = locked ? TEXT.locked(Math.ceil(lockRemainingMs(lock, clock) / 60000)) : message;
+  // Messages are stored as keys so they re-render in the current language.
+  const line = (m, l) => (typeof PIN_TEXT[l][m.key] === 'function' ? PIN_TEXT[l][m.key](m.n) : PIN_TEXT[l][m.key]);
+  const shown = locked ? { key: 'locked', n: Math.ceil(lockRemainingMs(lock, clock) / 60000) } : message;
+  const t = PIN_TEXT[lang];
 
   return <SafeAreaView style={styles.screen}>
     <ScrollView contentContainerStyle={styles.content}>
-      <View style={styles.topRow}>
-        {onBack && <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back" style={styles.backPill}>
-          <Text style={[textStyle('label'), styles.primaryText]}>← {TEXT.back.en} / </Text>
-          <Text style={[textStyle('label', 'ur'), styles.primaryText]}>{TEXT.back.ur}</Text>
+      <View style={[styles.topRow, urdu && styles.flip]}>
+        {onBack && <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel={t.back} style={styles.backPill}>
+          {urdu
+            ? <><Text style={[textStyle('label', 'ur'), styles.primaryText]}>{t.back}</Text><Text style={[textStyle('label'), styles.primaryText]}> →</Text></>
+            : <Text style={[textStyle('label'), styles.primaryText]}>← {t.back}</Text>}
         </Pressable>}
         <View style={styles.shield}><Text style={styles.shieldIcon}>{'\u{1F6E1}︎'}</Text></View>
       </View>
 
       <View style={styles.header}>
-        <Text accessibilityRole="header" style={[textStyle('headlineMd'), styles.title]}>{title.en}</Text>
-        <Text style={[textStyle('headlineMd', 'ur'), styles.title, styles.centred]}>{title.ur}</Text>
-        <Text style={[textStyle('body'), styles.subtitle]}>{TEXT.subtitle}</Text>
+        <Text accessibilityRole="header" style={[textStyle('headlineMd', lang), styles.title]}>{t[mode]}</Text>
+        <Text style={[textStyle('body', lang), styles.subtitle]}>{t.subtitle}</Text>
       </View>
 
       <View style={styles.card}>
-        <View style={styles.dots} accessible accessibilityLabel={`${entry.length} of ${PIN.LENGTH} digits entered`}>
+        <View style={styles.dots} accessible accessibilityLabel={t.digitsEntered(entry.length, PIN.LENGTH)}>
           {Array.from({ length: PIN.LENGTH }, (_, i) => <View key={i} testID="pin-dot" style={[styles.dot, i < entry.length && styles.dotFilled]} />)}
         </View>
         {shown && <View style={styles.banner} accessibilityLiveRegion="polite">
-          <Text style={[textStyle('label'), styles.bannerText]}>⚠ {shown.en}</Text>
-          <Text style={[textStyle('body', 'ur'), styles.bannerText]}>{shown.ur}</Text>
+          <Text style={[textStyle('body', lang), styles.bannerText]}>⚠ {line(shown, lang)}</Text>
         </View>}
       </View>
 
-      <PinKeypad onDigit={pressDigit} onDelete={() => setEntry((e) => e.slice(0, -1))} disabled={locked} />
+      <PinKeypad onDigit={pressDigit} onDelete={() => setEntry((e) => e.slice(0, -1))} disabled={locked} language={lang} />
 
       {mode === 'verify' && onForgotPin && <Pressable onPress={onForgotPin} accessibilityRole="link" style={styles.forgot}>
-        <Text style={[textStyle('label'), styles.link]}>{TEXT.forgot.en}</Text>
-        <Text style={[textStyle('body', 'ur'), styles.primaryText, styles.centred]}>{TEXT.forgot.ur}</Text>
+        <Text style={[textStyle('body', lang), styles.link, styles.centred]}>{t.forgot}</Text>
       </Pressable>}
     </ScrollView>
   </SafeAreaView>;
@@ -137,6 +128,7 @@ export default function PinScreen({ store, onUnlocked, onBack, onForgotPin, now 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.parentBackground },
   content: { padding: spacing.screen, gap: spacing.lg },
+  flip: { flexDirection: 'row-reverse' },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   backPill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: colors.surface },
   shield: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },

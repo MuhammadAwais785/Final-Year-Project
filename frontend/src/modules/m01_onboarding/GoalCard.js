@@ -24,7 +24,7 @@ export default function GoalCard({ goal, index, error, language = 'en', onChange
       </Pressable>
     </View>
     {isSkill
-      ? <OptionPicker language={language} options={skillOptions} value={goal.skill} onChange={(skill) => onChange(goal.id, { skill })} />
+      ? <OptionPicker wrap language={language} options={skillOptions} value={goal.skill} onChange={(skill) => onChange(goal.id, { skill })} />
       : <TextField testID={`target-${index}`} language={language} label={unit} keyboardType="number-pad" maxLength={3}
         value={goal.target == null ? '' : String(goal.target)}
         onChangeText={(text) => onChange(goal.id, { target: text ? parseInt(text.replace(/\D/g, ''), 10) || null : null })} />}
