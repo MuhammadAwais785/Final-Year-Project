@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { colors, fonts, textStyle, touch, typography } from '../src/theme';
+import { colors, fonts, textStyle, touch, typography, URDU_GLYPH_PAD } from '../src/theme';
 
 const FONT_DIR = path.join(__dirname, '../src/assets/fonts');
 
@@ -40,10 +40,20 @@ describe('theme', () => {
 
   test('textStyle returns right-to-left Urdu styles, falling back for sizes Urdu lacks', () => {
     expect(textStyle('body', 'ur')).toEqual({
-      fontSize: 15, lineHeight: 34, fontFamily: 'NotoNastaliqUrdu-Regular', writingDirection: 'rtl', textAlign: 'right',
+      fontSize: 15, lineHeight: 34, fontFamily: 'NotoNastaliqUrdu-Regular', writingDirection: 'rtl', textAlign: 'right', paddingHorizontal: URDU_GLYPH_PAD,
     });
     expect(textStyle('label', 'ur')).toMatchObject({ fontSize: 15, fontFamily: 'NotoNastaliqUrdu-Regular' });
     expect(textStyle('display', 'ur')).toMatchObject({ fontSize: 26, fontFamily: 'NotoNastaliqUrdu-Bold' });
+  });
+
+  test('Urdu text gets glyph padding and never a line limit or fixed height; English is unchanged', () => {
+    Object.keys({ ...typography.ur, ...typography.en }).forEach((variant) => {
+      const ur = textStyle(variant, 'ur');
+      expect(ur.paddingHorizontal).toBe(URDU_GLYPH_PAD);
+      expect(ur).not.toHaveProperty('numberOfLines');
+      expect(ur).not.toHaveProperty('height');
+      expect(textStyle(variant)).not.toHaveProperty('paddingHorizontal');
+    });
   });
 
   test('unknown variants fall back to body', () => {

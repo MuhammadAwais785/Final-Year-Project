@@ -12,7 +12,7 @@ import { HOME_TEXT } from './homeText';
  */
 function Bilingual({ en, ur, variant, enColor, urColor = enColor, centred, urduOnly }) {
   const align = centred ? styles.centred : null;
-  return <View>
+  return <View style={styles.bilingual}>
     {!urduOnly && <Text style={[textStyle(variant), { color: enColor }, align]}>{en}</Text>}
     <Text style={[textStyle(variant, 'ur'), { color: urduOnly ? enColor : urColor }, align]}>{ur}</Text>
   </View>;
@@ -105,6 +105,7 @@ export default function HomeScreen({ onChildMode, onParentPortal, childModeAvail
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.parentBackground },
   content: { padding: spacing.screen, gap: spacing.lg },
+  bilingual: { flexShrink: 1 },
   centred: { textAlign: 'center' },
   toggle: { alignSelf: 'flex-end' },
   flip: { flexDirection: 'row-reverse' },
