@@ -6,8 +6,8 @@ support a child's communication, learning, mood, and progress.
 The project has two separate applications:
 
 - **Frontend:** React Native with JavaScript for Android and iOS.
-- **Backend:** Node.js, Express, and MongoDB Atlas for the REST API and data
-  storage.
+- **Backend:** Node.js, Express, and Supabase (PostgreSQL) for the REST API and
+  data storage.
 
 The main testing target is an Android emulator or a physical Android phone
 connected through Android Studio.
@@ -20,7 +20,7 @@ Install these tools before starting:
 2. **Android Studio**
 3. **Android SDK and Android Emulator**
 4. **JDK 17**
-5. **MongoDB Atlas account**
+5. **Supabase account** (PostgreSQL database)
 6. **Git** (for team collaboration)
 
 For Android Studio, make sure an Android SDK platform, SDK Platform-Tools,
@@ -32,12 +32,14 @@ Android SDK Build-Tools, and at least one emulator system image are installed.
 silent-screen-syndrome/
 ├── backend/
 │   ├── src/
-│   │   ├── config/          # Database connection
+│   │   ├── config/          # Supabase client and database helpers
 │   │   ├── controllers/     # Business logic
-│   │   ├── middleware/      # Authentication and error handling
-│   │   ├── models/          # MongoDB/Mongoose schemas
+│   │   ├── middleware/      # Authentication, rate limiting, error handling
+│   │   ├── models/          # Supabase data-access models and validators
 │   │   ├── routes/          # REST API routes
 │   │   └── server.js        # Backend entry point
+│   ├── supabase/            # PostgreSQL schema and RLS SQL
+│   ├── __tests__/           # Backend Jest + Supertest suite
 │   ├── .env.example         # Environment variable template
 │   └── package.json         # Backend dependencies and scripts
 │
@@ -84,18 +86,20 @@ npm install --prefix frontend
 Copy-Item backend\.env.example backend\.env
 ```
 
-Open `backend\.env` and set real values:
+Open `backend\.env` and set real values from your Supabase project (**Project Settings → API**):
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/silent-screen-syndrome
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 JWT_SECRET=use-a-long-random-secret
 CLIENT_ORIGIN=*
 ```
 
-In MongoDB Atlas, add your development IP address under **Network Access** and
-create a database user under **Database Access**. Never commit the `.env` file
-or share its password and secret.
+In your Supabase project, open **SQL Editor** and run `backend/supabase/schema.sql`
+once to create the `guardians`, `child_profiles`, `sessions`, and `attempts`
+tables with Row Level Security (RLS) enabled. Never commit `backend\.env` or
+share your `SUPABASE_SERVICE_ROLE_KEY` or `JWT_SECRET`.
 
 ## Running the Application
 
@@ -172,10 +176,26 @@ The backend currently provides:
 - `GET /api/health` - Check whether the API is running
 - `POST /api/auth/register` - Create a guardian account
 - `POST /api/auth/login` - Log in a guardian
+- `GET /api/auth/me` - Get the currently authenticated guardian profile
+- `PATCH /api/auth/me` - Update guardian name or preferred language (`en` / `ur`)
+- `POST /api/auth/change-password` - Change guardian password
+- `DELETE /api/auth/me` - Delete guardian account and cascade child data
+- `PUT /api/auth/pin` - Set or reset the 4-digit parent PIN
+- `POST /api/auth/pin/verify` - Verify the 4-digit parent PIN
 - `GET /api/profiles` - Get the logged-in guardian's child profiles
-- `POST /api/profiles` - Create a child profile
-- `POST /api/sync` - Upload offline session records
-- `GET /api/reports` - Get learning session records
+- `POST /api/profiles` - Create a child profile (ages 3–7)
+- `PUT/PATCH /api/profiles/:id` - Update a child profile
+- `DELETE /api/profiles/:id` - Delete a child profile
+- `GET/POST /api/profiles/:id/consent` - Read or save versioned consent records
+- `GET/PUT /api/profiles/:id/goals` - Read or replace child learning goals (BR-7)
+- `GET/POST /api/profiles/:id/baselines` - Read or save baseline assessments (BR-6)
+- `GET /api/games/activities` - List available speech games and metadata
+- `GET /api/games/content` - Fetch bilingual EN/UR game prompts and clues
+- `GET /api/games/progress/:childId` - Get child stars, daily milestone, and per-activity stats
+- `GET /api/games/sessions/:childId` - Get child game session history
+- `POST /api/games/sessions` - Submit a single game round and attempts (BR-20 allowlist)
+- `POST /api/sync` - Upload offline `{ sessions, attempts }` records (strict BR-20 allowlist)
+- `GET /api/reports` - Get learning session and attempt records (supports `?childId=`)
 
 Protected endpoints require this header:
 
@@ -212,6 +232,9 @@ npm start --prefix frontend
 # Build and run Android
 npm run android --prefix frontend
 
+# Run backend tests
+npm test --prefix backend
+
 # Run frontend lint
 npm run lint --prefix frontend
 
@@ -221,8 +244,9 @@ npm test --prefix frontend
 
 ## Troubleshooting
 
-- **MongoDB connection error:** Check `backend\.env`, Atlas Network Access,
-  database credentials, and the connection string.
+- **Supabase connection or permission error:** Check `SUPABASE_URL` and
+  `SUPABASE_SERVICE_ROLE_KEY` in `backend\.env`, and verify you ran
+  `backend/supabase/schema.sql` in the Supabase SQL Editor.
 - **Emulator cannot reach the API:** Use `10.0.2.2`, not `localhost`.
 - **Phone cannot reach the API:** Use the computer's local IPv4 address and
   keep both devices on the same Wi-Fi network.
