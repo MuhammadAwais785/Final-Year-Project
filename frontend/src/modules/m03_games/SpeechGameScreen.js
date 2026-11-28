@@ -21,8 +21,10 @@ import RoundSummary from './RoundSummary';
 import { recognizer as defaultRecognizer } from './speech';
 
 // Saves a round as a session. Failures are swallowed: a storage problem must not break the game (UC-5 POST-1).
-const persist = (sessions, childId, activity, startedAt, endedAt, state, partial) => {
-  sessions.saveSession(childId, { activity, startedAt, endedAt, partial, round: state }).catch(() => {});
+const persist = (sessions, childId, activity, startedAt, endedAt, state, partial, onSessionSaved) => {
+  sessions.saveSession(childId, { activity, startedAt, endedAt, partial, round: state })
+    .then((saved) => onSessionSaved?.(saved))
+    .catch(() => {});
 };
 
 const newRound = (ids, size) => createRound(pickPrompts(ids, size));
@@ -43,6 +45,7 @@ export default function SpeechGameScreen({
   now = Date.now,
   rewards = defaultRewards,
   sessions = defaultSessions,
+  onSessionSaved,
   onDone,
   onExit,
 }) {
@@ -91,7 +94,7 @@ export default function SpeechGameScreen({
   const saveRound = (state) => {
     if (!childId || savedRoundRef.current === state || state.attemptLog.length === 0) return;
     savedRoundRef.current = state;
-    persist(sessions, childId, content.activity, startedAtRef.current, now(), state, !state.finished);
+    persist(sessions, childId, content.activity, startedAtRef.current, now(), state, !state.finished, onSessionSaved);
     const earned = state.finished ? summarize(state).stars : 0;
     if (earned <= 0) return;
     rewards.addStars(childId, earned, now()).then((result) => {

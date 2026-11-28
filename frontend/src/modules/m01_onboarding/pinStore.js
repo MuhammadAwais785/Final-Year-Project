@@ -2,13 +2,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { pbkdf2 } from '@noble/hashes/pbkdf2';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex } from '@noble/hashes/utils';
-import { initialLockState } from './pinLock';
+import { saveAccountPin, verifyAccountPin } from '../../api/auth';
+import { initialLockState, registerSuccess } from './pinLock';
 
 /**
  * Parent PIN storage for PinScreen (BR-34: the PIN is stored only in hashed form).
  * The PIN is hashed with PBKDF2-SHA256 and a per-PIN salt, so the plain PIN is never saved.
- * Note: the PIN is kept on this phone for now; the SRS ties it to the account,
- * so it moves to the backend with the sync work (M-08).
+ * Account-synced wrapper (`createAccountPinStore`) keeps the phone cache and backend account PIN in sync.
  */
 const PIN_KEY = '@silent_screen/parent_pin';
 const LOCK_KEY = '@silent_screen/pin_lock';
@@ -44,4 +44,66 @@ export async function loadLockState() {
 
 export async function saveLockState(state) {
   await AsyncStorage.setItem(LOCK_KEY, JSON.stringify(state));
+}
+
+export async function clearLocalPin() {
+  await Promise.all([
+    AsyncStorage.removeItem(PIN_KEY),
+    AsyncStorage.removeItem(LOCK_KEY),
+  ]);
+}
+
+/**
+ * PinScreen store backed by both local offline PBKDF2 hash and guardian account PIN endpoints.
+ */
+export function createAccountPinStore({
+  hasAccountPin = false,
+  onPinSynced,
+  saveRemotePin = saveAccountPin,
+  verifyRemotePin = verifyAccountPin,
+} = {}) {
+  return {
+    async hasPin() {
+      if (await hasPin()) return true;
+      return Boolean(hasAccountPin);
+    },
+
+    async savePin(pin) {
+      await savePin(pin);
+      try {
+        await saveRemotePin({ pin });
+        onPinSynced?.();
+      } catch {
+        // Offline-first: local salted PIN still protects Parent Portal immediately.
+      }
+    },
+
+    async checkPin(pin) {
+      if (await hasPin()) {
+        return checkPin(pin);
+      }
+      if (!hasAccountPin) return false;
+      try {
+        const res = await verifyRemotePin(pin);
+        if (res?.data?.valid) {
+          await savePin(pin);
+          return true;
+        }
+        return false;
+      } catch (error) {
+        if (error?.response?.status === 401) return false;
+        throw error;
+      }
+    },
+
+    loadLockState,
+    saveLockState,
+
+    async resetWithPassword({ password, newPin }) {
+      await saveRemotePin({ pin: newPin, password });
+      await savePin(newPin);
+      await saveLockState(registerSuccess());
+      onPinSynced?.();
+    },
+  };
 }

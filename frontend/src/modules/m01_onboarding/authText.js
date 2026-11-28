@@ -1,0 +1,85 @@
+export const AUTH_LIMITS = {
+  NAME_MAX_LENGTH: 60,
+  PASSWORD_MIN_LENGTH: 8,
+  PASSWORD_MAX_LENGTH: 128,
+};
+
+/**
+ * Guardian authentication wording in English and Urdu (UI-8).
+ */
+export const AUTH_TEXT = {
+  en: {
+    appName: 'Silent Screen',
+    subtitle: 'Sign in to manage child profiles, goals and progress',
+    modes: {
+      login: 'Sign in',
+      register: 'Create account',
+    },
+    nameLabel: 'Your name',
+    namePlaceholder: 'e.g. Awais',
+    emailLabel: 'Email address',
+    emailPlaceholder: 'name@example.com',
+    passwordLabel: 'Password',
+    passwordPlaceholder: `At least ${AUTH_LIMITS.PASSWORD_MIN_LENGTH} characters`,
+    confirmPasswordLabel: 'Confirm password',
+    confirmPasswordPlaceholder: 'Re-enter your password',
+    show: 'Show',
+    hide: 'Hide',
+    signIn: 'Sign in',
+    signingIn: 'Signing in…',
+    createAccount: 'Create account',
+    creatingAccount: 'Creating account…',
+    errors: {
+      nameRequired: 'Please enter your name.',
+      nameTooLong: `Use ${AUTH_LIMITS.NAME_MAX_LENGTH} characters or fewer.`,
+      emailInvalid: 'Please enter a valid email address.',
+      passwordRequired: 'Please enter your password.',
+      passwordShort: `Use at least ${AUTH_LIMITS.PASSWORD_MIN_LENGTH} characters.`,
+      passwordTooLong: `Use ${AUTH_LIMITS.PASSWORD_MAX_LENGTH} characters or fewer.`,
+      passwordMismatch: 'Passwords do not match.',
+    },
+    apiErrors: {
+      invalidCredentials: 'Incorrect email or password.',
+      emailExists: 'An account with this email already exists.',
+      rateLimited: 'Too many attempts. Please wait a few minutes and try again.',
+      network: 'Could not reach the server. Check your internet and try again.',
+    },
+  },
+  ur: {
+    appName: 'سائلنٹ اسکرین',
+    subtitle: 'بچوں کے پروفائل، اہداف اور پیش رفت دیکھنے کے لیے لاگ اِن کریں',
+    modes: {
+      login: 'لاگ اِن',
+      register: 'نیا اکاؤنٹ',
+    },
+    nameLabel: 'آپ کا نام',
+    namePlaceholder: 'مثلاً اویس',
+    emailLabel: 'ای میل',
+    emailPlaceholder: 'name@example.com',
+    passwordLabel: 'پاس ورڈ',
+    passwordPlaceholder: `کم از کم ${AUTH_LIMITS.PASSWORD_MIN_LENGTH} حروف`,
+    confirmPasswordLabel: 'پاس ورڈ کی تصدیق',
+    confirmPasswordPlaceholder: 'پاس ورڈ دوبارہ درج کریں',
+    show: 'دکھائیں',
+    hide: 'چھپائیں',
+    signIn: 'لاگ اِن کریں',
+    signingIn: 'لاگ اِن ہو رہا ہے…',
+    createAccount: 'اکاؤنٹ بنائیں',
+    creatingAccount: 'اکاؤنٹ بن رہا ہے…',
+    errors: {
+      nameRequired: 'براہ کرم اپنا نام درج کریں۔',
+      nameTooLong: `نام ${AUTH_LIMITS.NAME_MAX_LENGTH} حروف سے زیادہ نہ ہو۔`,
+      emailInvalid: 'براہ کرم درست ای میل درج کریں۔',
+      passwordRequired: 'براہ کرم پاس ورڈ درج کریں۔',
+      passwordShort: `پاس ورڈ کم از کم ${AUTH_LIMITS.PASSWORD_MIN_LENGTH} حروف کا ہونا چاہیے۔`,
+      passwordTooLong: `پاس ورڈ ${AUTH_LIMITS.PASSWORD_MAX_LENGTH} حروف سے زیادہ نہ ہو۔`,
+      passwordMismatch: 'دونوں پاس ورڈ آپس میں نہیں ملتے۔',
+    },
+    apiErrors: {
+      invalidCredentials: 'ای میل یا پاس ورڈ غلط ہے۔',
+      emailExists: 'اس ای میل پر اکاؤنٹ پہلے سے موجود ہے۔',
+      rateLimited: 'بہت زیادہ کوششیں ہو گئیں۔ چند منٹ بعد دوبارہ کوشش کریں۔',
+      network: 'سرور سے رابطہ نہیں ہو سکا۔ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں۔',
+    },
+  },
+};

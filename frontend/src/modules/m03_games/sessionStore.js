@@ -76,6 +76,12 @@ export async function getSessions(childId) {
   return [...(await read(childId)).sessions].reverse();
 }
 
+/** All saved attempts for one child (BR-20: metadata only, no audio or transcripts). */
+export async function getAttempts(childId) {
+  if (!childId) return [];
+  return (await read(childId)).attempts;
+}
+
 /** Sessions not yet synced, oldest first, with their attempts, for the sync. */
 export async function getUnsynced(childId) {
   if (!childId) return { sessions: [], attempts: [] };
